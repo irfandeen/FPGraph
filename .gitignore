@@ -1,0 +1,7 @@
+# Everything
+*
+
+# Except
+!.gitignore
+!FPGraph.srcs/
+!FPGraph.srcs/**
