@@ -19,40 +19,15 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-// makes it seem like 
 
 module vga_driver(
-    input wire           clk,
-    output wire [9:0]      x,
-    output wire [9:0]      y,
-    output wire       p_tick,
-    output wire            en,
-    output reg [9:0]   min_x = 560,
-    output reg [9:0]   min_y = 140,
-    output reg [9:0]   max_x = 1360, 
-    output reg [9:0]   max_y = 940,
-    output wire        Hsync,
-    output wire        Vsync
+    input wire [9:0] x_in,
+    input wire [9:0] y_in,
+    output wire [15:0] x_out,
+    output wire [15:0] y_out
 );
-    wire reset;
-    assign reset = 0;
-
-    wire [9:0] x_raw;
-    wire [9:0] y_raw;
-
-    VGAControl vga_control (
-        .clk_100MHz(clk),   // from FPGA
-        .reset(reset),        // system reset
-        .video_on(en),    // ON while pixel counts for x and y and within display area
-        .hsync(Hsync),       // horizontal sync
-        .vsync(Vsync),       // vertical sync
-        .p_tick(p_tick),      // the 25MHz pixel/second rate signal, pixel tick
-        .x(x_raw),     // pixel count/position of pixel x, max 0-799
-        .y(y_raw)      // pixel count/position of pixel y, max 0-524
-    );
     
-    assign x = x_raw * 3;
-    assign y = y_raw * 2;
-    
+    assign x_out = x_in * 3;
+    assign y_out = (y_in * 9) >> 2;
     
 endmodule
