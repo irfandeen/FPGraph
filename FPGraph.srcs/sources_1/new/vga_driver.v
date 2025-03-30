@@ -20,14 +20,19 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module vga_driver(
+module vga_driver #(
+    parameter X_MUL = 12,
+    parameter X_DIV = 5,
+    parameter Y_MUL = 9,
+    parameter Y_DIV = 5
+)(
     input wire [9:0] x_in,
     input wire [9:0] y_in,
     output wire [15:0] x_out,
     output wire [15:0] y_out
 );
-    
-    assign x_out = x_in * 3;
-    assign y_out = (y_in * 9) >> 2;
+
+    assign x_out = (x_in * X_MUL) / X_DIV;
+    assign y_out = (y_in * Y_MUL) / Y_DIV;
     
 endmodule

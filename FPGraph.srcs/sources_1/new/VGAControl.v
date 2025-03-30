@@ -17,13 +17,15 @@ module VGAControl(
     output p_tick,      // the 25MHz pixel/second rate signal, pixel tick
     output [9:0] x,     // pixel count/position of pixel x, max 0-799
     output [9:0] y      // pixel count/position of pixel y, max 0-524
-);
+    );
     
     // Based on VGA standards found at vesa.org for 640x480 resolution
     // Total horizontal width of screen = 800 pixels, partitioned  into sections
+    
+    // 640 x 480
     parameter HD = 640;             // horizontal display area width in pixels
-    parameter HF = 48;              // horizontal front porch width in pixels
-    parameter HB = 16;              // horizontal back porch width in pixels
+    parameter HF = 16;              // horizontal front porch width in pixels
+    parameter HB = 48;              // horizontal back porch width in pixels
     parameter HR = 96;              // horizontal retrace width in pixels
     parameter HMAX = HD+HF+HB+HR-1; // max value of horizontal counter = 799
     // Total vertical length of screen = 525 pixels, partitioned into sections
@@ -33,17 +35,35 @@ module VGAControl(
     parameter VR = 2;               // vertical retrace length in pixels  
     parameter VMAX = VD+VF+VB+VR-1; // max value of vertical counter = 524   
     
+    
+    /*
+    // 1920 x 1080
+    parameter HD = 1920;             // horizontal display area width in pixels
+    parameter HF = 88;              // horizontal front porch width in pixels
+    parameter HB = 148;              // horizontal back porch width in pixels
+    parameter HR = 44;              // horizontal retrace width in pixels
+    parameter HMAX = HD+HF+HB+HR-1; // max value of horizontal counter = 799
+    // Total vertical length of screen = 525 pixels, partitioned into sections
+    parameter VD = 1080;             // vertical display area length in pixels 
+    parameter VF = 4;              // vertical front porch length in pixels  
+    parameter VB = 36;              // vertical back porch length in pixels   
+    parameter VR = 5;               // vertical retrace length in pixels  
+    parameter VMAX = VD+VF+VB+VR-1; // max value of vertical counter = 524       
+    */
+    
     // *** Generate 25MHz from 100MHz *********************************************************
-	reg  [1:0] r_25MHz;
-	wire w_25MHz;
-	
-	always @(posedge clk_100MHz or posedge reset)
-		if(reset)
-		  r_25MHz <= 0;
-		else
-		  r_25MHz <= r_25MHz + 1;
-	
-	assign w_25MHz = (r_25MHz == 0) ? 1 : 0; // assert tick 1/4 of the time
+	//reg  [1:0] r_25MHz;
+	//wire w_25MHz;
+	wire w_40MHz; // NOT 40 MHz LOOK BELOW
+    // ****************************************************************************************
+    
+	clk_wiz_0 i_clk_0(
+	   .reset(reset),
+	   .clk_in1(clk_100MHz),
+	   .clk_out1(w_40MHz), // this is actually 25MHz, i am lazy to rename everything
+	   .clk_out2(),
+	   .locked()
+	);
     // ****************************************************************************************
     
     // Counter Registers, two each for buffering to avoid glitches
@@ -70,7 +90,7 @@ module VGAControl(
         end
          
     //Logic for horizontal counter
-    always @(posedge w_25MHz or posedge reset)      // pixel tick
+    always @(posedge w_40MHz or posedge reset)      // pixel tick
         if(reset)
             h_count_next = 0;
         else
@@ -80,7 +100,7 @@ module VGAControl(
                 h_count_next = h_count_reg + 1;         
   
     // Logic for vertical counter
-    always @(posedge w_25MHz or posedge reset)
+    always @(posedge w_40MHz or posedge reset)
         if(reset)
             v_count_next = 0;
         else
@@ -91,10 +111,10 @@ module VGAControl(
                     v_count_next = v_count_reg + 1;
         
     // h_sync_next asserted within the horizontal retrace area
-    assign h_sync_next = (h_count_reg >= (HD+HB) && h_count_reg <= (HD+HB+HR-1));
+    assign h_sync_next = (h_count_reg >= (HD+HF) && h_count_reg <= (HD+HF+HR-1));
     
     // v_sync_next asserted within the vertical retrace area
-    assign v_sync_next = (v_count_reg >= (VD+VB) && v_count_reg <= (VD+VB+VR-1));
+    assign v_sync_next = (v_count_reg >= (VD+VF) && v_count_reg <= (VD+VF+VR-1));
     
     // Video ON/OFF - only ON while pixel counts are within the display area
     assign video_on = (h_count_reg < HD) && (v_count_reg < VD); // 0-639 and 0-479 respectively
@@ -104,6 +124,6 @@ module VGAControl(
     assign vsync  = v_sync_reg;
     assign x      = h_count_reg;
     assign y      = v_count_reg;
-    assign p_tick = w_25MHz;
+    assign p_tick = w_40MHz;
             
 endmodule
