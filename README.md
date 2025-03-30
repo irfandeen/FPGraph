@@ -16,6 +16,7 @@ A graphing calculator implemented on the Basys 3 Artix-7 FPGA board.
 - [X] (W8)  Implement Graphing Logic for 2 Linear Functions
 - [X] (W9)  Draw output onto VGA Display
 - [ ] (W10) Enable resizing/paning of graph using mouse input
+- [ ] (W11) Axes labels
 - [X] (W11) Extension: Draw more than two functions simultaneously
 - [ ] (W11) Extension: Sidebar showing equations of graphs
 - [ ] (W12) Extension: Intersections between two or more graphs
