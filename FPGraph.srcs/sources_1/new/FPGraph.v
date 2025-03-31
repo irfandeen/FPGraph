@@ -10,7 +10,13 @@ module FPGraph(
     output reg [3:0]  vgaBlue,
     output wire Hsync,
     output wire Vsync,
-    output reg sanity_led
+    output reg sanity_led,
+    output wire [3:0] an,
+    output wire [7:0] seg,
+    
+    // Mouse IO
+    inout PS2Clk,
+    inout PS2Data
 );
     // Graph boundaries (AFTER SCALING)         // 1080p //480p
     parameter TOP_LEFT_X_COORD  =   120;        //560;   //120;
@@ -26,18 +32,14 @@ module FPGraph(
     parameter Y_MUL = 1; // 9     1   // target y resolution / 480
     parameter Y_DIV = 1; // 4     1
 
+    // VGA Wires
 	wire reset, p_tick, p_en;
-	wire [9:0]  x_raw;
-	wire [9:0]  y_raw;
-	wire [15:0] x;
-    wire [15:0] y;
+	wire [9:0]  x_raw, y_raw;
+	wire [15:0] x, y;
     
-    wire [15:0] graph_x;
-    wire [15:0] graph_y;
-    wire [3:0]  graph_red;
-    wire [3:0]  graph_green;
-    wire [3:0]  graph_blue;
-  
+    // Graphing Wires
+    wire [15:0] graph_x, graph_y;
+    wire [3:0]  graph_red, graph_green, graph_blue;
 	assign reset = 0;
 
     VGAControl vga_control (
@@ -109,5 +111,52 @@ module FPGraph(
             vgaBlue    <= 4'h0;
         end
     end
+
+    // Mouse wires
+    wire [11:0] xpos, ypos;
+    wire [3:0] zpos;
+    wire left, middle, right, new_event;
+    
+    // Mouse block
+    MouseCtl mouse_interface (
+       .clk(clk),
+       .rst(0),
+       .xpos(xpos),
+       .ypos(ypos),
+       .zpos(zpos),
+       .left(left),
+       .middle(middle),
+       .right(right),
+       .new_event(new_event),
+       .value(0),
+       .setx(0),
+       .sety(0),
+       .setmax_x(0),
+       .setmax_y(0),
+       .ps2_clk(PS2Clk),
+       .ps2_data(PS2Data)
+    );
+    
+    // Test Code for Scroll State module
+    wire signed [15:0] digit;
+    scroll_state segstate (
+        .clk(clk), .reset(reset),
+        .zpos(zpos),
+        .min_state(-9),
+        .max_state(0),
+        .overflow(1), 
+        .state(digit)
+        );
+    assign an = 4'b1110;
+    assign seg = (digit == 0) ? 8'b1100_0000 :
+    (digit == -1) ? 8'b1111_1001 :
+    (digit == -2) ? 8'b1010_0100 :
+    (digit == -3) ? 8'b1011_0000 :
+    (digit == -4) ? 8'b1001_1001 :
+    (digit == -5) ? 8'b1001_0010 :
+    (digit == -6) ? 8'b1000_0010 :
+    (digit == -7) ? 8'b1111_1000 :
+    (digit == -8) ? 8'b1000_0000 :
+    (digit == -9) ? 8'b1001_0000 : 8'b1111_1111;
 
 endmodule
