@@ -72,6 +72,7 @@ module FPGraph(
         .TOP_LEFT_Y_COORD(TOP_Y_COORD),
         .QUADRANT_WIDTH(QUADRANT_WIDTH)
     ) graphing_logic (
+        .clk(clk),
         .x_in(x),
         .y_in(y),
         .r(graph_red),
@@ -142,21 +143,21 @@ module FPGraph(
     scroll_state segstate (
         .clk(clk), .reset(reset),
         .zpos(zpos),
-        .min_state(-9),
-        .max_state(0),
+        .min_state(0),
+        .max_state(9),
         .overflow(1), 
         .state(digit)
         );
     assign an = 4'b1110;
     assign seg = (digit == 0) ? 8'b1100_0000 :
-    (digit == -1) ? 8'b1111_1001 :
-    (digit == -2) ? 8'b1010_0100 :
-    (digit == -3) ? 8'b1011_0000 :
-    (digit == -4) ? 8'b1001_1001 :
-    (digit == -5) ? 8'b1001_0010 :
-    (digit == -6) ? 8'b1000_0010 :
-    (digit == -7) ? 8'b1111_1000 :
-    (digit == -8) ? 8'b1000_0000 :
-    (digit == -9) ? 8'b1001_0000 : 8'b1111_1111;
+    (digit == 1) ? 8'b1111_1001 :
+    (digit == 2) ? 8'b1010_0100 :
+    (digit == 3) ? 8'b1011_0000 :
+    (digit == 4) ? 8'b1001_1001 :
+    (digit == 5) ? 8'b1001_0010 :
+    (digit == 6) ? 8'b1000_0010 :
+    (digit == 7) ? 8'b1111_1000 :
+    (digit == 8) ? 8'b1000_0000 :
+    (digit == 9) ? 8'b1001_0000 : 8'b1111_1111;
 
 endmodule
