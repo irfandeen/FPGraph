@@ -10,8 +10,8 @@ module FloatingPoint(
     input [1:0]    operation,
     output         finalSign,
     output [23:0]  finalResultInteger, 
-    output [46:0]  finalResultDecimalUnrounded,
-    output [23:0]  finalResultDecimal   
+    output [23:0]  finalResultDecimal,
+    output reg isCalculated   
 );
 
     // Using 24 fractional bits for 6-digit precision:
@@ -20,6 +20,7 @@ module FloatingPoint(
     
     reg signed [98:0] intermediateResult;
     reg [1:0]         signOverride;
+    wire [46:0] finalResultDecimalUnrounded;
     
     localparam ADD         = 0;
     localparam SUB         = 1;
@@ -31,8 +32,9 @@ module FloatingPoint(
     localparam NO_OVERRIDE = 2;
     
     always @(*) begin
+        isCalculated = 0;
         signOverride = NO_OVERRIDE;
-        
+    
         // Build fixed-point values using 24 fractional bits
         firstValue  = (firstValueInteger << 24) + ((firstValueDecimal << 24) / 1000000);
         secondValue = (secondValueInteger << 24) + ((secondValueDecimal << 24) / 1000000);
@@ -91,6 +93,8 @@ module FloatingPoint(
                 intermediateResult = 0;
             end
         endcase
+
+        isCalculated = 1; // Set the flag to indicate calculation is done
     end
     
     // Extract the integer portion from bits [47:24]
