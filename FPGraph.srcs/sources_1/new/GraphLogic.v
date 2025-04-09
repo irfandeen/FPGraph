@@ -28,15 +28,19 @@ module GraphLogic #(
     input wire clk,
     input wire [15:0] x_in,
     input wire [15:0] y_in,
+    input wire [15:0] origin_x,
+    input wire [15:0] origin_y,
+    input wire        dir_x,
+    input wire        dir_y,
     output reg [3:0] r,
     output reg [3:0] g,
     output reg [3:0] b
 );
     // (x, y) graph centered signed coordinates
-    wire signed [15:0] x = (x_in - TOP_LEFT_X_COORD - QUADRANT_WIDTH);
-    wire signed [15:0] y = QUADRANT_WIDTH - (y_in - TOP_LEFT_Y_COORD);
+    wire signed [15:0] x = x_in - (dir_x ? origin_x : -origin_x);
+    wire signed [15:0] y = (dir_y ? origin_y : -origin_y) - y_in;
 
-    
+    /*
     // framebuffer memory
     wire [17:0] read_addr = ((y + 200) * 400 + (x + 200));
     wire read_data;
@@ -81,45 +85,45 @@ module GraphLogic #(
         end else begin
             r <= 4'h0; g <= 4'h0; b <= 4'h0;  // background
         end
+    end */
+    
+    
+    
+    
+    //Output Logic
+    always @(*) begin
+        if (y >= x - 2 && y <= x + 2) begin // linear
+            r <= 4'hf;
+            g <= 4'h0;
+            b <= 4'h0;        
+        end
+        else if ( // (x-5)^2 / 16 == green
+            ((y >= (((x - 4) * (x - 4)) >> 4))
+             && (y <= (((x - 6) * (x - 6)) >> 4))) ||
+            ((y >= (((x - 6) * (x - 6)) >> 4)
+             && (y <= (((x - 4) * (x - 4)) >> 4))))
+        ) begin
+            r <= 4'h0;
+            g <= 4'hf;
+            b <= 4'h0;
+        end
+        else if ( //X^2 == blue
+            ((y >= (x - 1) * (x - 1)) && (y <= (x + 1) * (x + 1))) ||
+            ((y >= (x + 1) * (x + 1)) && (y <= (x - 1) * (x - 1)))
+        ) begin
+            r <= 4'h0;
+            g <= 4'h0;
+            b <= 4'hf;
+        end
+        else if (x == 0 || y == 0) begin // axes
+            r <= 4'h3;
+            g <= 4'h3;
+            b <= 4'h3;
+        end
+        else begin
+            r <= 4'h0;
+            g <= 4'h0;
+            b <= 4'h0;
+        end
     end
-    
-    
-    
-    
-//    //Output Logic
-//    always @(*) begin
-//        if (y >= coeff * x - 2 && y <= coeff * x + 2) begin // linear
-//            r <= 4'hf;
-//            g <= 4'h0;
-//            b <= 4'h0;        
-//        end
-//        else if ( // (x-5)^2 / 16 == green
-//            ((y >= (((x - 4) * (x - 4)) >> 4))
-//             && (y <= (((x - 6) * (x - 6)) >> 4))) ||
-//            ((y >= (((x - 6) * (x - 6)) >> 4)
-//             && (y <= (((x - 4) * (x - 4)) >> 4))))
-//        ) begin
-//            r <= 4'h0;
-//            g <= 4'hf;
-//            b <= 4'h0;
-//        end
-//        else if ( //X^2 == blue
-//            ((y >= (x - 1) * (x - 1)) && (y <= (x + 1) * (x + 1))) ||
-//            ((y >= (x + 1) * (x + 1)) && (y <= (x - 1) * (x - 1)))
-//        ) begin
-//            r <= 4'h0;
-//            g <= 4'h0;
-//            b <= 4'hf;
-//        end
-//        else if (x == 0 || y == 0) begin // axes
-//            r <= 4'h3;
-//            g <= 4'h3;
-//            b <= 4'h3;
-//        end
-//        else begin
-//            r <= 4'h0;
-//            g <= 4'h0;
-//            b <= 4'h0;
-//        end
-//    end
 endmodule
