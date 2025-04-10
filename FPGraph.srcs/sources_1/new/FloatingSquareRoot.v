@@ -11,6 +11,7 @@ module FloatingSquareRoot(
     output resultSign,
     output reg isCalculated
 
+    /*
     //DEBUG ONLY
     //output  [23:0] finalResultIntegerDebug,
     //output  [23:0] finalResultDecimalDebug,
@@ -18,6 +19,7 @@ module FloatingSquareRoot(
     //output reg [3:0] stateDebug,
     //output reg [3:0] innerStateDebug
     //DEBUG ONLY
+    */
 );
 
     localparam ADD         = 0;

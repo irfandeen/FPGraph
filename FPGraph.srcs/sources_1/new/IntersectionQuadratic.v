@@ -14,8 +14,9 @@ module IntersectionQuadratic(
                       y1Integer, y1Decimal,
                       x2Integer, x2Decimal,
                       y2Integer, y2Decimal,
-    output reg [1:0] isCalculated,  // 0: NOT_CALCULATED, 1: CALCULATED, 2: NO_SOLUTION
+    output reg [1:0] isCalculated  // 0: NOT_CALCULATED, 1: CALCULATED, 2: NO_SOLUTION
 
+    /*
     //DEBUG ONLY
     output reg [5:0] calculationPhaseDebug,
 
@@ -30,6 +31,8 @@ module IntersectionQuadratic(
     output reg firstAnsSignDebug,
     output reg [23:0] firstAnsIntDebug, firstAnsDecDebug
     //DEBUG ONLY
+    */
+
 );
 
     localparam NOT_CALCULATED = 0, CALCULATED = 1, NO_SOLUTION = 2;
@@ -193,6 +196,7 @@ module IntersectionQuadratic(
     
     /* Main Sequential Calculation */
     always @(posedge basysClock) begin
+        /*
         //DEBUG ONLY
         calculationPhaseDebug <= calculationPhase;
 
@@ -210,6 +214,7 @@ module IntersectionQuadratic(
         firstAnsIntDebug <= firstAnsInt;
         firstAnsDecDebug <= firstAnsDec;
         //DEBUG ONLY
+        */
 
         prevStartCalculate <= startCalculate;
         if (startCalculate && !prevStartCalculate) begin
