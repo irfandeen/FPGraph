@@ -157,6 +157,21 @@ module IntersectionQuadratic(
     
     /* Main Sequential Calculation */
     always @(posedge basysClock) begin
+        
+        //DEBUG ONLY
+        calculationPhaseDebug <= calculationPhase;
+
+        isCalculatedRootDebug <= isCalculatedRoot;
+
+        sqrtDiscSignDebug <= sqrtDiscSign;
+        sqrtDiscIntDebug <= sqrtDiscInt;
+        sqrtDiscDecDebug <= sqrtDiscDec;
+
+        firstAnsSignDebug <= firstAnsSign;
+        firstAnsIntDebug <= firstAnsInt;
+        firstAnsDecDebug <= firstAnsDec;
+        //DEBUG ONLY
+        
         prevStartCalculate <= startCalculate;
         if (startCalculate && !prevStartCalculate) begin
             calculationPhase <= 0;
