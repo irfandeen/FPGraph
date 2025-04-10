@@ -30,14 +30,19 @@ module scene_controller(
     input [7:0] x_cor,
     input [7:0] y_cor,
     output  reg [7:0] array_out,
-    output [13:0] int_part_A1, int_part_B1, int_part_C1,
-                  int_part_A2, int_part_B2, int_part_C2,
-                  int_part_A3, int_part_B3, int_part_C3,
+    output [13:0] int_part_A1, int_part_B1, int_part_C1, int_part_D1,
+                  int_part_A2, int_part_B2, int_part_C2, int_part_D2,
+                  int_part_A3, int_part_B3, int_part_C3, int_part_D3,
     
-    output [6:0] deci_part_A1, deci_part_B1, deci_part_C1,
-                 deci_part_A2, deci_part_B2, deci_part_C2,
-                 deci_part_A3, deci_part_B3, deci_part_C3,
-    output reg enable1 = 0, enable2 = 0, enable3 = 0
+    output [6:0]  deci_part_A1, deci_part_B1, deci_part_C1, deci_part_D1,
+                  deci_part_A2, deci_part_B2, deci_part_C2, deci_part_D2,
+                  deci_part_A3, deci_part_B3, deci_part_C3, deci_part_D3,
+    
+    output        is_neg_A1, is_neg_B1, is_neg_C1, is_neg_D1,
+                  is_neg_A2, is_neg_B2, is_neg_C2, is_neg_D2,
+                  is_neg_A3, is_neg_B3, is_neg_C3, is_neg_D3
+
+    
 
     );
     
@@ -66,7 +71,7 @@ module scene_controller(
     parameter [3:0] interstate = 4'd0;
     parameter [3:0] mainmenu_1 = 4'd1;
     parameter [3:0] quadrmenu = 4'd2;
-    parameter [3:0] lnrmenu = 4'd3;
+
     parameter [3:0] numpad = 4'd4;
     parameter [3:0] eqnmenu = 4'd5;
     
@@ -74,11 +79,13 @@ module scene_controller(
     reg [7:0] state = interstate;
     reg [7:0] nextstate = eqnmenu;
     reg [7:0] prevstate = interstate;
-    reg [7:0] dot_x = 12;
+    reg [7:0] dot_x = 1;
     reg [7:0] dot_y = 3;
     reg [7:0] eqn = 1;
     
-    
+    reg enable1 = 0;
+    reg enable2 = 0;
+    reg enable3 = 0;
     
     //displayed var
     reg [7:0] letter;
@@ -91,6 +98,18 @@ module scene_controller(
     reg addA1, addB1, addC1;
     reg addA2, addB2, addC2;
     reg addA3, addB3, addC3;
+    
+    reg addD1, addD2, addD3;
+    reg is_negD1, is_negD2, is_negD3;
+    reg clearD1, clearD2, clearD3;
+
+    
+    
+    // Bitmaps for pixel drawing
+    wire [7:0] b4D1, b3D1, b2D1, b1D1, b0D1, b_1D1, b_2D1, neg_signD1;
+    wire [7:0] b4D2, b3D2, b2D2, b1D2, b0D2, b_1D2, b_2D2, neg_signD2;
+    wire [7:0] b4D3, b3D3, b2D3, b1D3, b0D3, b_1D3, b_2D3, neg_signD3;
+
     
     // ----- Instance A1 -----
     //wire [13:0] int_part_A1; wire [6:0] deci_part_A1;
@@ -208,6 +227,49 @@ module scene_controller(
         .int_part(int_part_C3), .deci_part(deci_part_C3), .neg_sign(neg_signC3),
         .b4(b4C3), .b3(b3C3), .b2(b2C3), .b1(b1C3), .b0(b0C3), .b_1(b_1C3), .b_2(b_2C3)
     );
+    
+    num_gen D1 (
+        .digit_in(digit_in),
+        .add(addD1),
+        .clear(clearD1),
+        .CLOCK(CLOCK),
+        .is_deci(is_deci),
+        .is_neg(is_negD1),
+        .int_part(int_part_D1),
+        .deci_part(deci_part_D1),
+        .neg_sign(neg_signD1),
+        .b4(b4D1), .b3(b3D1), .b2(b2D1), .b1(b1D1),
+        .b0(b0D1), .b_1(b_1D1), .b_2(b_2D1)
+    );
+    
+    num_gen D2 (
+        .digit_in(digit_in),
+        .add(addD2),
+        .clear(clearD2),
+        .CLOCK(CLOCK),
+        .is_deci(is_deci),
+        .is_neg(is_negD2),
+        .int_part(int_part_D2),
+        .deci_part(deci_part_D2),
+        .neg_sign(neg_signD2),
+        .b4(b4D2), .b3(b3D2), .b2(b2D2), .b1(b1D2),
+        .b0(b0D2), .b_1(b_1D2), .b_2(b_2D2)
+    );
+    
+    num_gen D3 (
+        .digit_in(digit_in),
+        .add(addD3),
+        .clear(clearD3),
+        .CLOCK(CLOCK),
+        .is_deci(is_deci),
+        .is_neg(is_negD3),
+        .int_part(int_part_D3),
+        .deci_part(deci_part_D3),
+        .neg_sign(neg_signD3),
+        .b4(b4D3), .b3(b3D3), .b2(b2D3), .b1(b1D3),
+        .b0(b0D3), .b_1(b_1D3), .b_2(b_2D3)
+    );
+
 
 
 
@@ -274,34 +336,18 @@ module scene_controller(
             
             case(state)
             
-            mainmenu_1: begin
-            pixel_array[dot_y][dot_x] <= 8'd36;
-            dot_y <= (dot_y > 1) ? dot_y - 4 : dot_y;
-            end
-            
             quadrmenu:begin
-            if (dot_y == 6) begin
+            if (dot_y == 5) begin
             pixel_array[dot_y][dot_x] <=8'd36;
             dot_y <= 1;
             dot_x <= 1;
-            end else if (dot_y > 6) begin
+            end else if (dot_y > 5) begin
             pixel_array[dot_y][dot_x] <= 8'd36;
             dot_y <= dot_y - 2;   
             dot_x <= 4;   
             end
             end
             
-            lnrmenu:begin
-            if (dot_y == 8) begin
-            pixel_array[dot_y][dot_x] <=8'd36;
-            dot_y <= 1;
-            dot_x <= 1;
-            end else if (dot_y > 8) begin
-            pixel_array[dot_y][dot_x] <= 8'd36;
-            dot_y <= dot_y - 2;   
-            dot_x <= 4;   
-            end
-            end
             
             numpad:begin
             pixel_array[dot_y][dot_x] <= 8'd36;
@@ -321,36 +367,20 @@ module scene_controller(
             //BTN DOWN
             else if (btnd_press) begin
             case(state)
-                        
-               mainmenu_1: begin              
-                pixel_array[dot_y][dot_x] <= 8'd36;
-                dot_y <= (dot_y < 9) ? dot_y + 4 : dot_y;
-               end
-              
-              
+               
               quadrmenu:begin
               if (dot_y == 1) begin
               pixel_array[dot_y][dot_x] <= 8'd36;
-              dot_y <= 6;
+              dot_y <= 5;
               dot_x <= 4;
               end 
               else begin
               pixel_array[dot_y][dot_x] <= 8'd36;
-              dot_y <= (dot_y < 10) ? dot_y + 2: dot_y;
+              dot_y <= (dot_y < 11) ? dot_y + 2: dot_y;
               end
               end
               
-              lnrmenu:begin
-              if (dot_y == 1) begin
-              pixel_array[dot_y][dot_x] <= 8'd36;
-              dot_y <= 8;
-              dot_x <= 4;
-              end 
-              else begin
-              pixel_array[dot_y][dot_x] <= 8'd36;
-              dot_y <= (dot_y < 10) ? dot_y + 2: dot_y;
-              end
-              end
+              
               
               numpad:begin
               pixel_array[dot_y][dot_x] <= 8'd36;
@@ -371,32 +401,9 @@ module scene_controller(
             else if (btnc_press) begin
             
             case(state)
-              mainmenu_1:begin
-              if (dot_y == 9) begin
-                  state <= interstate;
-                  nextstate <= quadrmenu;
-                  dot_x <= 1;
-                  dot_y <= 1;
-              end if (dot_y == 5) begin
-              state <= interstate;
-                  nextstate <= lnrmenu;
-                  dot_x <= 1;
-                  dot_y <= 1;
-              end
-              else if (dot_y == 1) begin
-              state <= interstate;
-              nextstate <= eqnmenu;
-              dot_x <= 8'd12;
-              dot_y <= 3 * eqn;
-              end
-              end
               
               quadrmenu:begin
               if (dot_y == 1 && dot_x ==1) begin
-              state <= interstate;
-              nextstate <= mainmenu_1;
-              dot_x <= 1;
-              dot_y <= 9;
               
               case(eqn)
               1:begin
@@ -405,7 +412,9 @@ module scene_controller(
               is_negB1 <= 0;
               clearB1 <= 1;
               is_negC1 <= 0;
-              clearC1 <= 1;              
+              clearC1 <= 1;
+              is_negD1 <= 0;
+              clearD1 <= 1;              
               end
               2:begin
               is_negA2 <= 0;
@@ -414,6 +423,8 @@ module scene_controller(
               clearB2 <= 1;
               is_negC2 <= 0;
               clearC2 <= 1;
+              is_negD2 <= 0;
+              clearD2 <= 1;
               end
               3:begin
               is_negA3 <= 0;
@@ -422,30 +433,31 @@ module scene_controller(
               clearB3 <= 1;
               is_negC3 <= 0;
               clearC3 <= 1;
+              is_negD3 <= 0;
+              clearD3 <= 1;
               end
               default:;
               endcase
               end
               else if (dot_x == 12 && dot_y == 1) begin
               state <= interstate; nextstate <= eqnmenu;
-              dot_x <= 12;
-              dot_y <= eqn/3;
-              case(eqn)
-              1:enable1 <= 1;
-              2:enable2 <= 1;
-              3:enable3 <= 1;
-              endcase
+              dot_x <= 1;
+              dot_y <= eqn * 3;
               end
 
               else begin
-               if (dot_y == 6 && dot_x == 4) begin
+               if (dot_y == 5 && dot_x == 4) begin
                    letter <= 6'd10;
                end
-               else if (dot_y == 8 && dot_x == 4) begin
+               else if (dot_y == 7 && dot_x == 4) begin
                    letter <= 6'd11;
                end
-               else if (dot_y == 10 && dot_x == 4) begin
+               else if (dot_y == 9 && dot_x == 4) begin
                    letter <= 6'd12;
+               end
+               
+               else if (dot_y == 11 && dot_x == 4) begin
+                  letter <= 6'd13;
                end
                state <= interstate;
                nextstate <= numpad;
@@ -457,73 +469,10 @@ module scene_controller(
 
               end
               
-              lnrmenu:begin
-              if (dot_y == 1 && dot_x ==1) begin
-              nextstate <= mainmenu_1;
-              state <= interstate;
-              dot_x <= 1;
-              dot_y <= 5;
-              
-              case(eqn)
-              1:begin
-              is_negA1 <= 0;
-              clearA1 <= 1;
-              is_negB1 <= 0;
-              clearB1 <= 1;
-              is_negC1 <= 0;
-              clearC1 <= 1;              
-              end
-              2:begin
-              is_negA2 <= 0;
-              clearA2 <= 1;
-              is_negB2 <= 0;
-              clearB2 <= 1;
-              is_negC2 <= 0;
-              clearC2 <= 1;
-              end
-              3:begin
-              is_negA3 <= 0;
-              clearA3 <= 1;
-              is_negB3 <= 0;
-              clearB3 <= 1;
-              is_negC3 <= 0;
-              clearC3 <= 1;
-              end
-              default:;
-              endcase
-              
-              end
-              
-              else if (dot_x == 12 && dot_y == 1) begin
-                            state <= interstate; nextstate <= eqnmenu;
-                            dot_x <= 12;
-                            dot_y <= eqn/3;
-                            case(eqn)
-                            1:enable1 <= 1;
-                            2:enable2 <= 1;
-                            3:enable3 <= 1;
-                            endcase
-                            end
-
-              else begin
-              if (dot_y == 8 && dot_x == 4) begin
-                 letter <= 6'd11;
-              end
-              else if (dot_y == 10 && dot_x == 4) begin
-                letter <= 6'd12;
-              end
-              state <= interstate;               
-              nextstate <= numpad;
-              prevstate <= lnrmenu;
-              dot_x <= 1;
-              dot_y <= 2;
-              end
-
-              end
-              
+            
               numpad:begin
-              if (dot_x == 9 && dot_y == 11) begin
-              dot_x <= 4; dot_y <= (letter == 6'd10) ? 6 : (letter == 6'd11) ? 8 : 10;
+              if (dot_x == 13 && dot_y == 8) begin
+              dot_x <= 4; dot_y <= 5 + (letter - 10) * 2;
               nextstate <= prevstate;
               state <= interstate;
               is_deci <= 0;             
@@ -540,6 +489,9 @@ module scene_controller(
               end
               if (letter == 6'd12) begin
               addC1 <= 1;
+              end
+              if (letter == 6'd13) begin
+              addD1 <= 1;
               end              
               end
               2:begin
@@ -552,6 +504,9 @@ module scene_controller(
               if (letter == 6'd12) begin
               addC2 <= 1;
               end
+              if (letter == 6'd13) begin
+              addD2 <= 1;
+              end
               end
               3:begin
               if (letter == 6'd10) begin
@@ -562,6 +517,9 @@ module scene_controller(
               end
               if (letter == 6'd12) begin
               addC3 <= 1;
+              end
+              if (letter == 6'd13) begin
+              addD3 <= 1;
               end
               end
               default:;
@@ -580,6 +538,9 @@ module scene_controller(
                       if (letter == 6'd12) begin
                           is_negC1 <= 1;
                       end
+                      if (letter == 6'd13) begin
+                          is_negD1 <= 1;
+                      end
                   end
                   
                   2: begin
@@ -592,6 +553,9 @@ module scene_controller(
                       if (letter == 6'd12) begin
                           is_negC2 <= 1;
                       end
+                      if (letter == 6'd13) begin
+                          is_negD2 <= 1;
+                      end
                   end
                   
                   3: begin
@@ -603,6 +567,9 @@ module scene_controller(
                       end
                       if (letter == 6'd12) begin
                           is_negC3 <= 1;
+                      end
+                      if (letter == 6'd13) begin
+                          is_negD3 <= 1;
                       end
                   end
                   
@@ -628,6 +595,11 @@ module scene_controller(
                           is_deci <= 0;
                           is_negC1 <= 0;
                       end
+                      if (letter == 6'd13) begin
+                          clearD1 <= 1;
+                          is_deci <= 0;
+                          is_negD1 <= 0;
+                      end
                   end
               
                   2: begin
@@ -645,6 +617,11 @@ module scene_controller(
                           clearC2 <= 1;
                           is_deci <= 0;
                           is_negC2 <= 0;
+                      end
+                      if (letter == 6'd13) begin
+                          clearD2 <= 1;
+                          is_deci <= 0;
+                          is_negD2 <= 0;
                       end
                   end
               
@@ -664,6 +641,11 @@ module scene_controller(
                           is_deci <= 0;
                           is_negC3 <= 0;
                       end
+                      if (letter == 6'd13) begin
+                          clearD3 <= 1;
+                          is_deci <= 0;
+                          is_negD3 <= 0;
+                     end
                   end
               
                   default: ;
@@ -672,7 +654,7 @@ module scene_controller(
 
               end
               
-              else if (dot_x == 13 && dot_y == 8) begin
+              else if (dot_x == 9 && dot_y == 11) begin
               is_deci <= 1;
               end
               
@@ -689,6 +671,9 @@ module scene_controller(
                       if (letter == 6'd12) begin
                           addC1 <= 1;
                       end
+                      if (letter == 6'd13) begin
+                          addD1 <= 1;
+                      end
                   end
               
                   2: begin
@@ -700,6 +685,9 @@ module scene_controller(
                       end
                       if (letter == 6'd12) begin
                           addC2 <= 1;
+                      end
+                      if (letter == 6'd13) begin
+                          addD2 <= 1;
                       end
                   end
               
@@ -713,6 +701,9 @@ module scene_controller(
                       if (letter == 6'd12) begin
                           addC3 <= 1;
                       end
+                      if (letter == 6'd13) begin
+                         addD3 <= 1;
+                      end
                   end
               
                   default: ;
@@ -723,46 +714,39 @@ module scene_controller(
               end
               
               eqnmenu:begin
-              if (dot_x == 12) begin
+
               eqn <= dot_y / 3;
               state <= interstate;
-              nextstate <= mainmenu_1;
+              nextstate <= quadrmenu;
               dot_x <= 1;
-              dot_y <= 5;
-              end
+              dot_y <= 1;
+
               
-              else if (dot_x == 14) begin
-              case(dot_y)
-              3:enable1 <= ~enable1;
-              6:enable2 <= ~enable2;
-              9:enable3 <= ~enable3;
-              default:;
-              endcase
-              end
               
-              else if (dot_x == 16) begin
-              case(dot_y)
-              3:begin 
-              enable1 <= 0; clearA1 <= 1;
-              clearB1 <= 1; clearC1 <= 1;
-              is_negA1 <= 0; is_negB1 <= 0;
-              is_negC1 <= 0;
-              end
-              6:begin
-              enable2 <= 0; clearA2 <= 1;
-              clearB2 <= 1; clearC2 <= 1;
-              is_negA2 <= 0; is_negB2 <= 0;
-              is_negC2 <= 0;
-              end
-              9:begin
-              enable3 <= 0; clearA3 <= 1;
-              clearB3 <= 1; clearC3 <= 1;
-              is_negA3 <= 0; is_negB3 <= 0;
-              is_negC3 <= 0;
-              end
-              default:;
-              endcase
-              end
+              
+//              else if (dot_x == 16) begin
+//              case(dot_y)
+//              3:begin 
+//              enable1 <= 0; clearA1 <= 1;
+//              clearB1 <= 1; clearC1 <= 1;
+//              is_negA1 <= 0; is_negB1 <= 0;
+//              is_negC1 <= 0;
+//              end
+//              6:begin
+//              enable2 <= 0; clearA2 <= 1;
+//              clearB2 <= 1; clearC2 <= 1;
+//              is_negA2 <= 0; is_negB2 <= 0;
+//              is_negC2 <= 0;
+//              end
+//              9:begin
+//              enable3 <= 0; clearA3 <= 1;
+//              clearB3 <= 1; clearC3 <= 1;
+//              is_negA3 <= 0; is_negB3 <= 0;
+//              is_negC3 <= 0;
+//              end
+//              default:;
+//              endcase
+//              end
               
               end
               
@@ -781,22 +765,13 @@ module scene_controller(
               end
               end
               
-              lnrmenu:begin
-              if (dot_y == 1 && dot_x == 1) begin
-              pixel_array[dot_y][dot_x] <= 8'd36;
-              dot_x <= 12;
-              end
-              end
-              
+             
               numpad:begin
               pixel_array[dot_y][dot_x] <= 8'd36;
               dot_x <= (dot_y < 8) ? ((dot_x < 9) ? dot_x + 4 : dot_x) : ((dot_x < 13) ? dot_x + 4 : dot_x);
               end
               
-              eqnmenu:begin
-              pixel_array[dot_y][dot_x] <= 8'd36;
-              dot_x <= (dot_x < 16) ? dot_x + 2 : dot_x;
-              end
+              
               
               default:;
               endcase
@@ -814,22 +789,14 @@ module scene_controller(
 
               end
              
-              lnrmenu:begin
-              if (dot_y == 1 && dot_x == 12) begin
-              pixel_array[dot_y][dot_x] <= 8'd36;
-              dot_x <= 1;
-              end
-              end
+           
               
               numpad:begin
               pixel_array[dot_y][dot_x] <= 8'd36;
               dot_x <= (dot_x > 1) ? dot_x - 4 : dot_x;
               end
               
-              eqnmenu:begin
-              pixel_array[dot_y][dot_x] <= 8'd36;
-              dot_x <= (dot_x > 12) ? dot_x - 2 : dot_x;
-              end
+              
               default:;
               endcase
             end
@@ -838,190 +805,122 @@ module scene_controller(
             
             case(state)
             
-            mainmenu_1: begin
-            //dot
-            
-             pixel_array[dot_y][dot_x] <= 8'd37;
-             //back
-             pixel_array[1][3] <= 8'd11; pixel_array[1][4] <= 8'd10;
-             pixel_array[1][5] <= 8'd12; pixel_array[1][6] <= 8'd20;
-             
-            //linear
-             pixel_array[5][3] <= 8'd21; pixel_array[5][4] <= 8'd18;
-             pixel_array[5][5] <= 8'd23; pixel_array[5][6] <= 8'd14;
-             pixel_array[5][7] <= 8'd10; pixel_array[5][8] <= 8'd27;
-            //quadratic
-            pixel_array[9][3] <= 8'd26;
-            pixel_array[9][4] <= 8'd30; pixel_array[9][5] <= 8'd10;
-            pixel_array[9][6] <= 8'd13; pixel_array[9][7] <= 8'd27;
-            pixel_array[9][8] <= 8'd10; pixel_array[9][9] <= 8'd29;
-            pixel_array[9][10] <= 8'd18; pixel_array[9][11] <= 8'd12;
-            end
-            
             quadrmenu: begin
-            //back
-            pixel_array[1][3] <= 8'd11;pixel_array[1][4] <= 8'd10;
-            pixel_array[1][5] <= 8'd12;pixel_array[1][6] <= 8'd20;
-            //calc
-            pixel_array[1][14] <= 8'd12;pixel_array[1][15] <= 8'd10;
-            pixel_array[1][16] <= 8'd21;pixel_array[1][17] <= 8'd12;
+            //reset
+            pixel_array[1][3] <= 8'd27;pixel_array[1][4] <= 8'd14;
+            pixel_array[1][5] <= 8'd28;pixel_array[1][6] <= 8'd14;
+             pixel_array[1][7] <= 8'd29;
+            //done
+            pixel_array[1][14] <= 8'd13;pixel_array[1][15] <= 8'd24;
+            pixel_array[1][16] <= 8'd23;pixel_array[1][17] <= 8'd14;
             //dot
             pixel_array[dot_y][dot_x] <= 8'd37;
             
             
-            //y=ax^2+bx+c
-            pixel_array[4][3] <= 8'd34;pixel_array[4][4] <= 8'd43;
-            pixel_array[4][5] <= 8'd10;
-            pixel_array[4][6] <= 8'd33;pixel_array[4][7] <= 8'd42;
-            pixel_array[4][8] <= 8'd2;pixel_array[4][9] <= 8'd38;
-            pixel_array[4][10] <= 8'd11;pixel_array[4][11] <= 8'd33;
-            pixel_array[4][12] <= 8'd38;pixel_array[4][13] <= 8'd12;
+            //y=ax^3+bx^2+cx+d
+            pixel_array[3][1] <= 8'd34;pixel_array[3][2] <= 8'd43;
+            pixel_array[3][3] <= 8'd10;
+            pixel_array[3][4] <= 8'd33;pixel_array[3][5] <= 8'd42;
+            pixel_array[3][6] <= 8'd3;pixel_array[3][7] <= 8'd38;
+            pixel_array[3][8] <= 8'd11;pixel_array[3][9] <= 8'd33;
+            pixel_array[3][10] <= 8'd42;pixel_array[3][11] <= 8'd2;
+            pixel_array[3][12] <= 8'd38;pixel_array[3][13] <= 8'd12;
+            pixel_array[3][14] <= 8'd33;pixel_array[3][15] <= 8'd38;
+            pixel_array[3][16] <= 8'd13;
             //a=
-            pixel_array[6][6] <= 8'd10;pixel_array[6][7] <= 8'd43;
+            pixel_array[5][6] <= 8'd10;pixel_array[5][7] <= 8'd43;
             //b=
-            pixel_array[8][6] <= 8'd11;pixel_array[8][7] <= 8'd43;
+            pixel_array[7][6] <= 8'd11;pixel_array[7][7] <= 8'd43;
             //c=
-            pixel_array[10][6] <= 8'd12;pixel_array[10][7] <= 8'd43;
+            pixel_array[9][6] <= 8'd12;pixel_array[9][7] <= 8'd43;
+            //d=
+            pixel_array[11][6] <= 8'd13;pixel_array[11][7] <= 8'd43;
             
             // DISPLAY THE NUM
             case(eqn)
                 1: begin
                     // A1
-                    pixel_array[6][9]  <= b4A1; pixel_array[6][10]  <= b3A1;
-                    pixel_array[6][11]  <= b2A1; pixel_array[6][12]  <= b1A1;
-                    pixel_array[6][13]  <= b0A1; pixel_array[6][14]  <= b_1A1;
-                    pixel_array[6][15] <= b_2A1; pixel_array[6][8] <= neg_signA1;
+                    pixel_array[5][9]  <= b4A1; pixel_array[5][10]  <= b3A1;
+                    pixel_array[5][11] <= b2A1; pixel_array[5][12]  <= b1A1;
+                    pixel_array[5][13] <= b0A1; pixel_array[5][14]  <= b_1A1;
+                    pixel_array[5][15] <= b_2A1; pixel_array[5][8]  <= neg_signA1;
             
                     // B1
-                    pixel_array[8][9]  <= b4B1; pixel_array[8][10] <= b3B1;
-                    pixel_array[8][11] <= b2B1; pixel_array[8][12] <= b1B1;
-                    pixel_array[8][13] <= b0B1; pixel_array[8][14] <= b_1B1;
-                    pixel_array[8][15] <= b_2B1; pixel_array[8][8]  <= neg_signB1;
+                    pixel_array[7][9]  <= b4B1; pixel_array[7][10]  <= b3B1;
+                    pixel_array[7][11] <= b2B1; pixel_array[7][12]  <= b1B1;
+                    pixel_array[7][13] <= b0B1; pixel_array[7][14]  <= b_1B1;
+                    pixel_array[7][15] <= b_2B1; pixel_array[7][8]  <= neg_signB1;
             
                     // C1
-                    pixel_array[10][9]  <= b4C1; pixel_array[10][10] <= b3C1;
-                    pixel_array[10][11] <= b2C1; pixel_array[10][12] <= b1C1;
-                    pixel_array[10][13] <= b0C1; pixel_array[10][14] <= b_1C1;
-                    pixel_array[10][15] <= b_2C1; pixel_array[10][8]  <= neg_signC1;
+                    pixel_array[9][9]  <= b4C1; pixel_array[9][10]  <= b3C1;
+                    pixel_array[9][11] <= b2C1; pixel_array[9][12]  <= b1C1;
+                    pixel_array[9][13] <= b0C1; pixel_array[9][14]  <= b_1C1;
+                    pixel_array[9][15] <= b_2C1; pixel_array[9][8]  <= neg_signC1;
+            
+                    // D1
+                    pixel_array[11][9]  <= b4D1; pixel_array[11][10]  <= b3D1;
+                    pixel_array[11][11] <= b2D1; pixel_array[11][12]  <= b1D1;
+                    pixel_array[11][13] <= b0D1; pixel_array[11][14]  <= b_1D1;
+                    pixel_array[11][15] <= b_2D1; pixel_array[11][8]  <= neg_signD1;
                 end
             
                 2: begin
                     // A2
-                    pixel_array[6][9]  <= b4A2; pixel_array[6][10]  <= b3A2;
-                    pixel_array[6][11]  <= b2A2; pixel_array[6][12]  <= b1A2;
-                    pixel_array[6][13]  <= b0A2; pixel_array[6][14]  <= b_1A2;
-                    pixel_array[6][15] <= b_2A2; pixel_array[6][8] <= neg_signA2;
+                    pixel_array[5][9]  <= b4A2; pixel_array[5][10]  <= b3A2;
+                    pixel_array[5][11] <= b2A2; pixel_array[5][12]  <= b1A2;
+                    pixel_array[5][13] <= b0A2; pixel_array[5][14]  <= b_1A2;
+                    pixel_array[5][15] <= b_2A2; pixel_array[5][8]  <= neg_signA2;
             
                     // B2
-                    pixel_array[8][9]  <= b4B2; pixel_array[8][10] <= b3B2;
-                    pixel_array[8][11] <= b2B2; pixel_array[8][12] <= b1B2;
-                    pixel_array[8][13] <= b0B2; pixel_array[8][14] <= b_1B2;
-                    pixel_array[8][15] <= b_2B2; pixel_array[8][8]  <= neg_signB2;
+                    pixel_array[7][9]  <= b4B2; pixel_array[7][10]  <= b3B2;
+                    pixel_array[7][11] <= b2B2; pixel_array[7][12]  <= b1B2;
+                    pixel_array[7][13] <= b0B2; pixel_array[7][14]  <= b_1B2;
+                    pixel_array[7][15] <= b_2B2; pixel_array[7][8]  <= neg_signB2;
             
                     // C2
-                    pixel_array[10][9]  <= b4C2; pixel_array[10][10] <= b3C2;
-                    pixel_array[10][11] <= b2C2; pixel_array[10][12] <= b1C2;
-                    pixel_array[10][13] <= b0C2; pixel_array[10][14] <= b_1C2;
-                    pixel_array[10][15] <= b_2C2; pixel_array[10][8]  <= neg_signC2;
+                    pixel_array[9][9]  <= b4C2; pixel_array[9][10]  <= b3C2;
+                    pixel_array[9][11] <= b2C2; pixel_array[9][12]  <= b1C2;
+                    pixel_array[9][13] <= b0C2; pixel_array[9][14]  <= b_1C2;
+                    pixel_array[9][15] <= b_2C2; pixel_array[9][8]  <= neg_signC2;
+            
+                    // D2
+                    pixel_array[11][9]  <= b4D2; pixel_array[11][10]  <= b3D2;
+                    pixel_array[11][11] <= b2D2; pixel_array[11][12]  <= b1D2;
+                    pixel_array[11][13] <= b0D2; pixel_array[11][14]  <= b_1D2;
+                    pixel_array[11][15] <= b_2D2; pixel_array[11][8]  <= neg_signD2;
                 end
             
                 3: begin
                     // A3
-                    pixel_array[6][9]  <= b4A3; pixel_array[6][10]  <= b3A3;
-                    pixel_array[6][11]  <= b2A3; pixel_array[6][12]  <= b1A3;
-                    pixel_array[6][13]  <= b0A3; pixel_array[6][14]  <= b_1A3;
-                    pixel_array[6][15] <= b_2A3; pixel_array[6][8] <= neg_signA3;
+                    pixel_array[5][9]  <= b4A3; pixel_array[5][10]  <= b3A3;
+                    pixel_array[5][11] <= b2A3; pixel_array[5][12]  <= b1A3;
+                    pixel_array[5][13] <= b0A3; pixel_array[5][14]  <= b_1A3;
+                    pixel_array[5][15] <= b_2A3; pixel_array[5][8]  <= neg_signA3;
             
                     // B3
-                    pixel_array[8][9]  <= b4B3; pixel_array[8][10] <= b3B3;
-                    pixel_array[8][11] <= b2B3; pixel_array[8][12] <= b1B3;
-                    pixel_array[8][13] <= b0B3; pixel_array[8][14] <= b_1B3;
-                    pixel_array[8][15] <= b_2B3; pixel_array[8][8]  <= neg_signB3;
+                    pixel_array[7][9]  <= b4B3; pixel_array[7][10]  <= b3B3;
+                    pixel_array[7][11] <= b2B3; pixel_array[7][12]  <= b1B3;
+                    pixel_array[7][13] <= b0B3; pixel_array[7][14]  <= b_1B3;
+                    pixel_array[7][15] <= b_2B3; pixel_array[7][8]  <= neg_signB3;
             
                     // C3
-                    pixel_array[10][9]  <= b4C3; pixel_array[10][10] <= b3C3;
-                    pixel_array[10][11] <= b2C3; pixel_array[10][12] <= b1C3;
-                    pixel_array[10][13] <= b0C3; pixel_array[10][14] <= b_1C3;
-                    pixel_array[10][15] <= b_2C3; pixel_array[10][8]  <= neg_signC3;
+                    pixel_array[9][9]  <= b4C3; pixel_array[9][10]  <= b3C3;
+                    pixel_array[9][11] <= b2C3; pixel_array[9][12]  <= b1C3;
+                    pixel_array[9][13] <= b0C3; pixel_array[9][14]  <= b_1C3;
+                    pixel_array[9][15] <= b_2C3; pixel_array[9][8]  <= neg_signC3;
+            
+                    // D3
+                    pixel_array[11][9]  <= b4D3; pixel_array[11][10]  <= b3D3;
+                    pixel_array[11][11] <= b2D3; pixel_array[11][12] <= b1D3;
+                    pixel_array[11][13] <= b0D3; pixel_array[11][14] <= b_1D3;
+                    pixel_array[11][15] <= b_2D3; pixel_array[11][8]  <= neg_signD3;
                 end
             
                 default: ;
             endcase
 
-
             end
-            
-            lnrmenu: begin
-            //back
-            pixel_array[1][3] <= 8'd11;pixel_array[1][4] <= 8'd10;
-            pixel_array[1][5] <= 8'd12;pixel_array[1][6] <= 8'd20;
-            
-            //calc
-            pixel_array[1][14] <= 8'd12;pixel_array[1][15] <= 8'd10;
-            pixel_array[1][16] <= 8'd21;pixel_array[1][17] <= 8'd12;
-            
-            //dot
-            pixel_array[dot_y][dot_x] <= 8'd37;
-            
-            //y=bx+c
-            pixel_array[4][3] <= 8'd34;pixel_array[4][4] <= 8'd43;
-            pixel_array[4][5] <= 8'd11;pixel_array[4][6] <= 8'd33;
-            pixel_array[4][7] <= 8'd38;pixel_array[4][8] <= 8'd12;
-            
-            //b=
-            pixel_array[8][6] <= 8'd11;pixel_array[8][7] <= 8'd43;
-            
-            //c=
-            pixel_array[10][6] <= 8'd12;pixel_array[10][7] <= 8'd43;
-            
-            //DISPLAY THE NUM
-            case(eqn)
-            1:begin
-                pixel_array[8][9] <= b4B1; pixel_array[8][10] <= b3B1;
-                pixel_array[8][11] <= b2B1; pixel_array[8][12] <= b1B1;
-                pixel_array[8][13] <= b0B1; pixel_array[8][14] <= b_1B1;
-                pixel_array[8][15] <= b_2B1; pixel_array[8][8] <= neg_signB1;
-            
-                pixel_array[10][9] <= b4C1; pixel_array[10][10] <= b3C1;
-                pixel_array[10][11] <= b2C1; pixel_array[10][12] <= b1C1;
-                pixel_array[10][13] <= b0C1; pixel_array[10][14] <= b_1C1;
-                pixel_array[10][15] <= b_2C1; pixel_array[10][8] <= neg_signC1;
-                end
-                        
-           2: begin
-                // B2
-                pixel_array[8][9]  <= b4B2; pixel_array[8][10] <= b3B2;
-                pixel_array[8][11] <= b2B2; pixel_array[8][12] <= b1B2;
-                pixel_array[8][13] <= b0B2; pixel_array[8][14] <= b_1B2;
-                pixel_array[8][15] <= b_2B2; pixel_array[8][8]  <= neg_signB2;
-            
-                // C2
-                pixel_array[10][9]  <= b4C2; pixel_array[10][10] <= b3C2;
-                pixel_array[10][11] <= b2C2; pixel_array[10][12] <= b1C2;
-                pixel_array[10][13] <= b0C2; pixel_array[10][14] <= b_1C2;
-                pixel_array[10][15] <= b_2C2; pixel_array[10][8]  <= neg_signC2;
-            end
-
-                        
-            3: begin
-                // B3
-                pixel_array[8][9]  <= b4B3; pixel_array[8][10] <= b3B3;
-                pixel_array[8][11] <= b2B3; pixel_array[8][12] <= b1B3;
-                pixel_array[8][13] <= b0B3; pixel_array[8][14] <= b_1B3;
-                pixel_array[8][15] <= b_2B3; pixel_array[8][8]  <= neg_signB3;
-            
-                // C3
-                pixel_array[10][9]  <= b4C3; pixel_array[10][10] <= b3C3;
-                pixel_array[10][11] <= b2C3; pixel_array[10][12] <= b1C3;
-                pixel_array[10][13] <= b0C3; pixel_array[10][14] <= b_1C3;
-                pixel_array[10][15] <= b_2C3; pixel_array[10][8]  <= neg_signC3;
-            end
-
-            default:;
-            endcase
-            
-            end
-
+        
             
             numpad: begin
             //numbers
@@ -1030,8 +929,9 @@ module scene_controller(
             pixel_array[5][7] <= 8'd5;pixel_array[5][11] <= 8'd6;
             pixel_array[8][3] <= 8'd7;pixel_array[8][7] <= 8'd8;
             pixel_array[8][11] <= 8'd9;pixel_array[11][3] <= 8'd39;
-            pixel_array[11][7] <= 8'd0;pixel_array[11][11] <= 8'd43;
-            pixel_array[8][15] <= 8'd44;pixel_array[11][15] <= 8'd12;
+            pixel_array[11][7] <= 8'd0;pixel_array[11][11] <= 8'd44;
+            pixel_array[8][15] <= 8'd28;pixel_array[8][16] <= 8'd14;
+            pixel_array[8][17] <= 8'd29;pixel_array[11][15] <= 8'd12;
             pixel_array[11][16] <= 8'd21;pixel_array[11][17] <= 8'd27;
             
             //dot
@@ -1039,7 +939,25 @@ module scene_controller(
             
             addA1 <= 0; addB1 <= 0; addC1 <= 0;
             addA2 <= 0; addB2 <= 0; addC2 <= 0;
-            addA3 <= 0; addB3 <= 0; addC3 <= 0;           
+            addA3 <= 0; addB3 <= 0; addC3 <= 0;
+            addD1 <= 0; addD2 <= 0; addD3 <= 0;        
+            
+            //D
+            if (is_deci) begin
+            pixel_array[0][13] <= 8'd45;pixel_array[0][14] <= 8'd45;
+            pixel_array[1][13] <= 8'd45;pixel_array[1][15] <= 8'd45;
+            pixel_array[2][13] <= 8'd45;pixel_array[2][16] <= 8'd45;
+            pixel_array[3][13] <= 8'd45;pixel_array[3][16] <= 8'd45;
+            pixel_array[4][13] <= 8'd45;pixel_array[4][15] <= 8'd45;
+            pixel_array[5][13] <= 8'd45;pixel_array[5][14] <= 8'd45;
+            end else begin
+            pixel_array[0][13] <= 8'd36;pixel_array[0][14] <= 8'd36;
+            pixel_array[1][13] <= 8'd36;pixel_array[1][15] <= 8'd36;
+            pixel_array[2][13] <= 8'd36;pixel_array[2][16] <= 8'd36;
+            pixel_array[3][13] <= 8'd36;pixel_array[3][16] <= 8'd36;
+            pixel_array[4][13] <= 8'd36;pixel_array[4][15] <= 8'd36;
+            pixel_array[5][13] <= 8'd36;pixel_array[5][14] <= 8'd36;
+            end  
             
             //letter
             pixel_array[0][1] <= letter; pixel_array[0][2] <= 8'd43;
@@ -1120,6 +1038,34 @@ module scene_controller(
                     default: ;
                 endcase
             end
+            
+            if (letter == 8'd13) begin
+                case(eqn)
+                    1: begin
+                        pixel_array[0][4]  <= b4D1; pixel_array[0][5]  <= b3D1;
+                        pixel_array[0][6]  <= b2D1; pixel_array[0][7]  <= b1D1;
+                        pixel_array[0][8]  <= b0D1; pixel_array[0][9]  <= b_1D1;
+                        pixel_array[0][10] <= b_2D1; pixel_array[0][3]  <= neg_signD1;
+                    end
+            
+                    2: begin
+                        pixel_array[0][4]  <= b4D2; pixel_array[0][5]  <= b3D2;
+                        pixel_array[0][6]  <= b2D2; pixel_array[0][7]  <= b1D2;
+                        pixel_array[0][8]  <= b0D2; pixel_array[0][9]  <= b_1D2;
+                        pixel_array[0][10] <= b_2D2; pixel_array[0][3]  <= neg_signD2;
+                    end
+            
+                    3: begin
+                        pixel_array[0][4]  <= b4D3; pixel_array[0][5]  <= b3D3;
+                        pixel_array[0][6]  <= b2D3; pixel_array[0][7]  <= b1D3;
+                        pixel_array[0][8]  <= b0D3; pixel_array[0][9]  <= b_1D3;
+                        pixel_array[0][10] <= b_2D3; pixel_array[0][3]  <= neg_signD3;
+                    end
+            
+                    default: ;
+                endcase
+            end
+
          
             end
             
@@ -1133,79 +1079,28 @@ module scene_controller(
             pixel_array[0][2] <= 8'd16; pixel_array[0][3] <= 8'd27;
             pixel_array[0][4] <= 8'd10; pixel_array[0][5] <= 8'd25;
             pixel_array[0][6] <= 8'd17;
+           
+            //equation 1
+            pixel_array[3][3] <= 8'd14; pixel_array[3][4] <= 8'd26;
+            pixel_array[3][5] <= 8'd30; pixel_array[3][6] <= 8'd10;
+            pixel_array[3][7] <= 8'd29; pixel_array[3][8] <= 8'd18;
+            pixel_array[3][9] <= 8'd24; pixel_array[3][10] <= 8'd23;
+            pixel_array[3][12] <= 8'd1;
             
-            //plot
-            pixel_array[0][9] <= 8'd25; pixel_array[0][10] <= 8'd21;
-            pixel_array[0][11] <= 8'd24; pixel_array[0][12] <= 8'd29;
+            //equation 2
+            pixel_array[6][3] <= 8'd14; pixel_array[6][4] <= 8'd26;
+            pixel_array[6][5] <= 8'd30; pixel_array[6][6] <= 8'd10;
+            pixel_array[6][7] <= 8'd29; pixel_array[6][8] <= 8'd18;
+            pixel_array[6][9] <= 8'd24; pixel_array[6][10] <= 8'd23;
+             pixel_array[6][12] <= 8'd2;
             
-            //T
-            pixel_array[0][14] <= 8'd29;
-            
-            //D
-            pixel_array[0][16] <= 8'd13;
-            
-            // eqn1 (starts at row 3)
-            pixel_array[4][0] <= (enable1 == 1) ? 8'd34 : 8'd23;
-            pixel_array[3][0]  <= 8'd1;   pixel_array[3][2]  <= 8'd10;
-            pixel_array[3][3]  <= 8'd43;  pixel_array[3][4]  <= neg_signA1;
-            pixel_array[3][5]  <= b4A1;   pixel_array[3][6]  <= b3A1;
-            pixel_array[3][7]  <= b2A1;   pixel_array[3][8]  <= b1A1;
-            pixel_array[3][9]  <= b0A1;   pixel_array[3][10] <= b_1A1;
-            pixel_array[3][11] <= b_2A1;
-            
-            pixel_array[4][2]  <= 8'd11;  pixel_array[4][3]  <= 8'd43;
-            pixel_array[4][4]  <= neg_signB1; pixel_array[4][5]  <= b4B1;
-            pixel_array[4][6]  <= b3B1;   pixel_array[4][7]  <= b2B1;
-            pixel_array[4][8]  <= b1B1;   pixel_array[4][9]  <= b0B1;
-            pixel_array[4][10] <= b_1B1;  pixel_array[4][11] <= b_2B1;
-            
-            pixel_array[5][2]  <= 8'd12;  pixel_array[5][3]  <= 8'd43;
-            pixel_array[5][4]  <= neg_signC1; pixel_array[5][5]  <= b4C1;
-            pixel_array[5][6]  <= b3C1;   pixel_array[5][7]  <= b2C1;
-            pixel_array[5][8]  <= b1C1;   pixel_array[5][9]  <= b0C1;
-            pixel_array[5][10] <= b_1C1;  pixel_array[5][11] <= b_2C1;
-            
-            // eqn2 (starts at row 6)
-            pixel_array[7][0] <= (enable2 == 1) ? 8'd34 : 8'd23;
-            pixel_array[6][0]  <= 8'd2;   pixel_array[6][2]  <= 8'd10;
-            pixel_array[6][3]  <= 8'd43;  pixel_array[6][4]  <= neg_signA2;
-            pixel_array[6][5]  <= b4A2;   pixel_array[6][6]  <= b3A2;
-            pixel_array[6][7]  <= b2A2;   pixel_array[6][8]  <= b1A2;
-            pixel_array[6][9]  <= b0A2;   pixel_array[6][10] <= b_1A2;
-            pixel_array[6][11] <= b_2A2;
-            
-            pixel_array[7][2]  <= 8'd11;  pixel_array[7][3]  <= 8'd43;
-            pixel_array[7][4]  <= neg_signB2; pixel_array[7][5]  <= b4B2;
-            pixel_array[7][6]  <= b3B2;   pixel_array[7][7]  <= b2B2;
-            pixel_array[7][8]  <= b1B2;   pixel_array[7][9]  <= b0B2;
-            pixel_array[7][10] <= b_1B2;  pixel_array[7][11] <= b_2B2;
-            
-            pixel_array[8][2]  <= 8'd12;  pixel_array[8][3]  <= 8'd43;
-            pixel_array[8][4]  <= neg_signC2; pixel_array[8][5]  <= b4C2;
-            pixel_array[8][6]  <= b3C2;   pixel_array[8][7]  <= b2C2;
-            pixel_array[8][8]  <= b1C2;   pixel_array[8][9]  <= b0C2;
-            pixel_array[8][10] <= b_1C2;  pixel_array[8][11] <= b_2C2;
-            
-            // eqn3 (starts at row 9)
-            pixel_array[10][0] <= (enable3 == 1) ? 8'd34 : 8'd23;
-            pixel_array[9][0]  <= 8'd3;   pixel_array[9][2]  <= 8'd10;
-            pixel_array[9][3]  <= 8'd43;  pixel_array[9][4]  <= neg_signA3;
-            pixel_array[9][5]  <= b4A3;   pixel_array[9][6]  <= b3A3;
-            pixel_array[9][7]  <= b2A3;   pixel_array[9][8]  <= b1A3;
-            pixel_array[9][9]  <= b0A3;   pixel_array[9][10] <= b_1A3;
-            pixel_array[9][11] <= b_2A3;
-            
-            pixel_array[10][2]  <= 8'd11;  pixel_array[10][3]  <= 8'd43;
-            pixel_array[10][4]  <= neg_signB3; pixel_array[10][5]  <= b4B3;
-            pixel_array[10][6]  <= b3B3;   pixel_array[10][7]  <= b2B3;
-            pixel_array[10][8]  <= b1B3;   pixel_array[10][9]  <= b0B3;
-            pixel_array[10][10] <= b_1B3;  pixel_array[10][11] <= b_2B3;
-            
-            pixel_array[11][2]  <= 8'd12;  pixel_array[11][3]  <= 8'd43;
-            pixel_array[11][4]  <= neg_signC3; pixel_array[11][5]  <= b4C3;
-            pixel_array[11][6]  <= b3C3;   pixel_array[11][7]  <= b2C3;
-            pixel_array[11][8]  <= b1C3;   pixel_array[11][9]  <= b0C3;
-            pixel_array[11][10] <= b_1C3;  pixel_array[11][11] <= b_2C3;
+            //equation 3
+            pixel_array[9][3] <= 8'd14; pixel_array[9][4] <= 8'd26;
+            pixel_array[9][5] <= 8'd30; pixel_array[9][6] <= 8'd10;
+            pixel_array[9][7] <= 8'd29; pixel_array[9][8] <= 8'd18;
+            pixel_array[9][9] <= 8'd24; pixel_array[9][10] <= 8'd23;
+            pixel_array[9][12] <= 8'd3;
+                        
             end
 
             default: state <= interstate;
@@ -1214,6 +1109,7 @@ module scene_controller(
                        clearA1 <= 0; clearB1 <= 0; clearC1 <= 0;
                        clearA2 <= 0; clearB2 <= 0; clearC2 <= 0;
                        clearA3 <= 0; clearB3 <= 0; clearC3 <= 0;
+                       clearD1 <= 0; clearD2 <= 0; clearD3 <= 0;
             end
             
            

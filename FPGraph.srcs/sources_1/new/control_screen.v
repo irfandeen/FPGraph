@@ -31,14 +31,18 @@ module control_screen(
     input btnu,
     input btnd,
     output reg [15:0] colour_out,
-    output [13:0] int_part_A1, int_part_B1, int_part_C1,
-                  int_part_A2, int_part_B2, int_part_C2,
-                  int_part_A3, int_part_B3, int_part_C3,
+    output [13:0] int_part_A1, int_part_B1, int_part_C1, int_part_D1,
+                      int_part_A2, int_part_B2, int_part_C2, int_part_D2,
+                      int_part_A3, int_part_B3, int_part_C3, int_part_D3,
         
-    output [6:0] deci_part_A1, deci_part_B1, deci_part_C1,
-                 deci_part_A2, deci_part_B2, deci_part_C2,
-                 deci_part_A3, deci_part_B3, deci_part_C3,
-    output  enable1, enable2, enable3
+        output [6:0]  deci_part_A1, deci_part_B1, deci_part_C1, deci_part_D1,
+                      deci_part_A2, deci_part_B2, deci_part_C2, deci_part_D2,
+                      deci_part_A3, deci_part_B3, deci_part_C3, deci_part_D3,
+        
+        output        is_neg_A1, is_neg_B1, is_neg_C1, is_neg_D1,
+                      is_neg_A2, is_neg_B2, is_neg_C2, is_neg_D2,
+                      is_neg_A3, is_neg_B3, is_neg_C3, is_neg_D3
+
     );
     
     parameter [7:0] x_incr = 5;
@@ -68,30 +72,30 @@ module control_screen(
    
    
    //scene_controller control_scene (.btnc(btnc), .btnr(btnr), .btnl(btnl), .btnu(btnu), .btnd(btnd), .x_cor(x_cor), .CLOCK(CLOCK), .y_cor(y_cor), .array_out(screen_chars));
-  // Instantiate the scene_controller
-       scene_controller u_scene_controller (
-           .btnc(btnc),
-           .btnr(btnr),
-           .btnl(btnl),
-           .btnu(btnu),
-           .btnd(btnd),
-           .CLOCK(CLOCK),
-           .x_cor(x_cor),
-           .y_cor(y_cor),
-           .array_out(screen_chars),
+  // Instantiate the scene_controller module
+   scene_controller u_scene_controller (
+       .btnc(btnc),
+       .btnr(btnr),
+       .btnl(btnl),
+       .btnu(btnu),
+       .btnd(btnd),
+       .CLOCK(CLOCK),
+       .x_cor(x_cor),
+       .y_cor(y_cor),
+       .array_out(screen_chars),
    
-           .int_part_A1(int_part_A1), .int_part_B1(int_part_B1), .int_part_C1(int_part_C1),
-           .int_part_A2(int_part_A2), .int_part_B2(int_part_B2), .int_part_C2(int_part_C2),
-           .int_part_A3(int_part_A3), .int_part_B3(int_part_B3), .int_part_C3(int_part_C3),
+       .int_part_A1(int_part_A1), .int_part_B1(int_part_B1), .int_part_C1(int_part_C1), .int_part_D1(int_part_D1),
+       .int_part_A2(int_part_A2), .int_part_B2(int_part_B2), .int_part_C2(int_part_C2), .int_part_D2(int_part_D2),
+       .int_part_A3(int_part_A3), .int_part_B3(int_part_B3), .int_part_C3(int_part_C3), .int_part_D3(int_part_D3),
    
-           .deci_part_A1(deci_part_A1), .deci_part_B1(deci_part_B1), .deci_part_C1(deci_part_C1),
-           .deci_part_A2(deci_part_A2), .deci_part_B2(deci_part_B2), .deci_part_C2(deci_part_C2),
-           .deci_part_A3(deci_part_A3), .deci_part_B3(deci_part_B3), .deci_part_C3(deci_part_C3),
+       .deci_part_A1(deci_part_A1), .deci_part_B1(deci_part_B1), .deci_part_C1(deci_part_C1), .deci_part_D1(deci_part_D1),
+       .deci_part_A2(deci_part_A2), .deci_part_B2(deci_part_B2), .deci_part_C2(deci_part_C2), .deci_part_D2(deci_part_D2),
+       .deci_part_A3(deci_part_A3), .deci_part_B3(deci_part_B3), .deci_part_C3(deci_part_C3), .deci_part_D3(deci_part_D3),
    
-           .enable1(enable1),
-           .enable2(enable2),
-           .enable3(enable3)
-       );
+       .is_neg_A1(is_neg_A1), .is_neg_B1(is_neg_B1), .is_neg_C1(is_neg_C1), .is_neg_D1(is_neg_D1),
+       .is_neg_A2(is_neg_A2), .is_neg_B2(is_neg_B2), .is_neg_C2(is_neg_C2), .is_neg_D2(is_neg_D2),
+       .is_neg_A3(is_neg_A3), .is_neg_B3(is_neg_B3), .is_neg_C3(is_neg_C3), .is_neg_D3(is_neg_D3)
+   );
    
 
                wire pixel_out;

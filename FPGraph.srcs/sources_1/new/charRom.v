@@ -26,7 +26,7 @@ module charRom(
     output pixel
     );
     
-    reg [4:0] data [44:0][4:0];
+    reg [4:0] data [45:0][4:0];
     
     initial begin
         // '0'
@@ -344,6 +344,13 @@ module charRom(
                  data[44][2] = 5'b00000;
                  data[44][3] = 5'b00000;
                  data[44][4] = 5'b00100;
+                 
+                 //'.' in the bot
+                 data[45][0] = 5'b11111;
+                 data[45][1] = 5'b11111;
+                 data[45][2] = 5'b11111;
+                 data[45][3] = 5'b11111;
+                 data[45][4] = 5'b11111;
                  
                  
            
