@@ -30,17 +30,15 @@ module scene_controller(
     input [7:0] x_cor,
     input [7:0] y_cor,
     output  reg [7:0] array_out,
-    output [13:0] int_part_A1, int_part_B1, int_part_C1, int_part_D1,
-                  int_part_A2, int_part_B2, int_part_C2, int_part_D2,
-                  int_part_A3, int_part_B3, int_part_C3, int_part_D3,
+    output [6:0] int_part_A1, int_part_B1, int_part_C1,
+                  int_part_A2, int_part_B2, int_part_C2,
+                  int_part_A3, int_part_B3, int_part_C3,
     
-    output [6:0]  deci_part_A1, deci_part_B1, deci_part_C1, deci_part_D1,
-                  deci_part_A2, deci_part_B2, deci_part_C2, deci_part_D2,
-                  deci_part_A3, deci_part_B3, deci_part_C3, deci_part_D3,
-    
-    output        is_neg_A1, is_neg_B1, is_neg_C1, is_neg_D1,
-                  is_neg_A2, is_neg_B2, is_neg_C2, is_neg_D2,
-                  is_neg_A3, is_neg_B3, is_neg_C3, is_neg_D3
+    output        is_neg_A1, is_neg_B1, is_neg_C1,
+                  is_neg_A2, is_neg_B2, is_neg_C2,
+                  is_neg_A3, is_neg_B3, is_neg_C3
+//    output reg [15:0] text_colour = 16'hFFFF,
+//    output reg [15:0] back_colour = 16'h0000           
 
     
 
@@ -71,22 +69,20 @@ module scene_controller(
     parameter [3:0] interstate = 4'd0;
     parameter [3:0] mainmenu_1 = 4'd1;
     parameter [3:0] quadrmenu = 4'd2;
-
+    parameter [3:0] start = 4'd6;
+    parameter [3:0] colour = 4'd7;
     parameter [3:0] numpad = 4'd4;
     parameter [3:0] eqnmenu = 4'd5;
     
     //state var
     reg [7:0] state = interstate;
-    reg [7:0] nextstate = eqnmenu;
+    reg [7:0] nextstate = start;
     reg [7:0] prevstate = interstate;
-    reg [7:0] dot_x = 1;
-    reg [7:0] dot_y = 3;
+    reg [7:0] dot_x = 4;
+    reg [7:0] dot_y = 7;
     reg [7:0] eqn = 1;
     
-    reg enable1 = 0;
-    reg enable2 = 0;
-    reg enable3 = 0;
-    
+  
     //displayed var
     reg [7:0] letter;
     integer i,j;
@@ -106,169 +102,144 @@ module scene_controller(
     
     
     // Bitmaps for pixel drawing
-    wire [7:0] b4D1, b3D1, b2D1, b1D1, b0D1, b_1D1, b_2D1, neg_signD1;
-    wire [7:0] b4D2, b3D2, b2D2, b1D2, b0D2, b_1D2, b_2D2, neg_signD2;
-    wire [7:0] b4D3, b3D3, b2D3, b1D3, b0D3, b_1D3, b_2D3, neg_signD3;
+    wire [7:0] b4D1, b3D1, neg_signD1;
+    wire [7:0] b4D2, b3D2, neg_signD2;
+    wire [7:0] b4D3, b3D3, neg_signD3;
+    
+    //colours
+    //background
+    parameter [15:0] black = 16'h0000;
+    parameter [15:0] blue = 16'h001F;
+    parameter [15:0] grey = 16'h8410;
+    parameter [15:0] orange = 16'hFD20;
+    
+    //text
+    parameter [15:0] white = 16'hFFFF;
+    parameter [15:0] green = 16'h07E0;
+    parameter [15:0] red = 16'hF800;
+    parameter [15:0] cyan = 16'h07FF;
+    
+    reg [1:0] text_state = 0;
+    reg [1:0] back_state = 0;
 
     
     // ----- Instance A1 -----
     //wire [13:0] int_part_A1; wire [6:0] deci_part_A1;
-    wire [7:0] b4A1, b3A1, b2A1, b1A1, b0A1, b_1A1, b_2A1, neg_signA1;
+    wire [7:0] b4A1, b3A1, neg_signA1;
     reg clearA1, is_negA1;
     
     // ----- Instance B1 -----
     //wire [13:0] int_part_B1; wire [6:0] deci_part_B1;
-    wire [7:0] b4B1, b3B1, b2B1, b1B1, b0B1, b_1B1, b_2B1, neg_signB1;
+    wire [7:0] b4B1, b3B1, neg_signB1;
     reg clearB1, is_negB1;
     
     // ----- Instance C1 -----
     //wire [13:0] int_part_C1; wire [6:0] deci_part_C1;
-    wire [7:0] b4C1, b3C1, b2C1, b1C1, b0C1, b_1C1, b_2C1, neg_signC1;
+    wire [7:0] b4C1, b3C1, neg_signC1;
     reg clearC1, is_negC1;
     
     // ----- Instance A2 -----
     //wire [13:0] int_part_A2; wire [6:0] deci_part_A2;
-    wire [7:0] b4A2, b3A2, b2A2, b1A2, b0A2, b_1A2, b_2A2, neg_signA2;
+    wire [7:0] b4A2, b3A2, neg_signA2;
     reg clearA2, is_negA2;
     
     // ----- Instance B2 -----
     //wire [13:0] int_part_B2; wire [6:0] deci_part_B2;
-    wire [7:0] b4B2, b3B2, b2B2, b1B2, b0B2, b_1B2, b_2B2, neg_signB2;
+    wire [7:0] b4B2, b3B2, neg_signB2;
     reg clearB2, is_negB2;
     
     // ----- Instance C2 -----
     //wire [13:0] int_part_C2; wire [6:0] deci_part_C2;
-    wire [7:0] b4C2, b3C2, b2C2, b1C2, b0C2, b_1C2, b_2C2, neg_signC2;
+    wire [7:0] b4C2, b3C2, neg_signC2;
     reg clearC2, is_negC2;
     
     // ----- Instance A3 -----
     //wire [13:0] int_part_A3; wire [6:0] deci_part_A3;
-    wire [7:0] b4A3, b3A3, b2A3, b1A3, b0A3, b_1A3, b_2A3, neg_signA3;
+    wire [7:0] b4A3, b3A3, neg_signA3;
     reg clearA3, is_negA3;
     
     // ----- Instance B3 -----
     //wire [13:0] int_part_B3; wire [6:0] deci_part_B3;
-    wire [7:0] b4B3, b3B3, b2B3, b1B3, b0B3, b_1B3, b_2B3, neg_signB3;
+    wire [7:0] b4B3, b3B3, neg_signB3;
     reg clearB3, is_negB3;
     
     // ----- Instance C3 -----
    //wire [13:0] int_part_C3; wire [6:0] deci_part_C3;
-    wire [7:0] b4C3, b3C3, b2C3, b1C3, b0C3, b_1C3, b_2C3, neg_signC3;
+    wire [7:0] b4C3, b3C3, neg_signC3;
     reg clearC3, is_negC3;
     
     // ----- A1 -----
     num_gen A1 (
         .digit_in(digit_in), .add(addA1), .clear(clearA1), .CLOCK(CLOCK),
-        .is_deci(is_deci), .is_neg(is_negA1),
-        .int_part(int_part_A1), .deci_part(deci_part_A1), .neg_sign(neg_signA1),
-        .b4(b4A1), .b3(b3A1), .b2(b2A1), .b1(b1A1), .b0(b0A1), .b_1(b_1A1), .b_2(b_2A1)
+        .is_neg(is_negA1),
+        .int_part(int_part_A1), .neg_sign(neg_signA1),
+        .b4(b4A1), .b3(b3A1)
     );
     
     // ----- B1 -----
     num_gen B1 (
         .digit_in(digit_in), .add(addB1), .clear(clearB1), .CLOCK(CLOCK),
-        .is_deci(is_deci), .is_neg(is_negB1),
-        .int_part(int_part_B1), .deci_part(deci_part_B1), .neg_sign(neg_signB1),
-        .b4(b4B1), .b3(b3B1), .b2(b2B1), .b1(b1B1), .b0(b0B1), .b_1(b_1B1), .b_2(b_2B1)
+         .is_neg(is_negB1),
+        .int_part(int_part_B1), .neg_sign(neg_signB1),
+        .b4(b4B1), .b3(b3B1)
     );
     
     // ----- C1 -----
     num_gen C1 (
         .digit_in(digit_in), .add(addC1), .clear(clearC1), .CLOCK(CLOCK),
-        .is_deci(is_deci), .is_neg(is_negC1),
-        .int_part(int_part_C1), .deci_part(deci_part_C1), .neg_sign(neg_signC1),
-        .b4(b4C1), .b3(b3C1), .b2(b2C1), .b1(b1C1), .b0(b0C1), .b_1(b_1C1), .b_2(b_2C1)
+        .is_neg(is_negC1),
+        .int_part(int_part_C1), .neg_sign(neg_signC1),
+        .b4(b4C1), .b3(b3C1)
     );
     
     // ----- A2 -----
     num_gen A2 (
         .digit_in(digit_in), .add(addA2), .clear(clearA2), .CLOCK(CLOCK),
-        .is_deci(is_deci), .is_neg(is_negA2),
-        .int_part(int_part_A2), .deci_part(deci_part_A2), .neg_sign(neg_signA2),
-        .b4(b4A2), .b3(b3A2), .b2(b2A2), .b1(b1A2), .b0(b0A2), .b_1(b_1A2), .b_2(b_2A2)
+        .is_neg(is_negA2),
+        .int_part(int_part_A2), .neg_sign(neg_signA2),
+        .b4(b4A2), .b3(b3A2)
     );
     
     // ----- B2 -----
     num_gen B2 (
         .digit_in(digit_in), .add(addB2), .clear(clearB2), .CLOCK(CLOCK),
-        .is_deci(is_deci), .is_neg(is_negB2),
-        .int_part(int_part_B2), .deci_part(deci_part_B2), .neg_sign(neg_signB2),
-        .b4(b4B2), .b3(b3B2), .b2(b2B2), .b1(b1B2), .b0(b0B2), .b_1(b_1B2), .b_2(b_2B2)
+        .is_neg(is_negB2),
+        .int_part(int_part_B2), .neg_sign(neg_signB2),
+        .b4(b4B2), .b3(b3B2)
     );
     
     // ----- C2 -----
     num_gen C2 (
         .digit_in(digit_in), .add(addC2), .clear(clearC2), .CLOCK(CLOCK),
-        .is_deci(is_deci), .is_neg(is_negC2),
-        .int_part(int_part_C2), .deci_part(deci_part_C2), .neg_sign(neg_signC2),
-        .b4(b4C2), .b3(b3C2), .b2(b2C2), .b1(b1C2), .b0(b0C2), .b_1(b_1C2), .b_2(b_2C2)
+         .is_neg(is_negC2),
+        .int_part(int_part_C2), .neg_sign(neg_signC2),
+        .b4(b4C2), .b3(b3C2)
     );
     
     // ----- A3 -----
     num_gen A3 (
         .digit_in(digit_in), .add(addA3), .clear(clearA3), .CLOCK(CLOCK),
-        .is_deci(is_deci), .is_neg(is_negA3),
-        .int_part(int_part_A3), .deci_part(deci_part_A3), .neg_sign(neg_signA3),
-        .b4(b4A3), .b3(b3A3), .b2(b2A3), .b1(b1A3), .b0(b0A3), .b_1(b_1A3), .b_2(b_2A3)
+        .is_neg(is_negA3),
+        .int_part(int_part_A3), .neg_sign(neg_signA3),
+        .b4(b4A3), .b3(b3A3)
     );
     
     // ----- B3 -----
     num_gen B3 (
         .digit_in(digit_in), .add(addB3), .clear(clearB3), .CLOCK(CLOCK),
-        .is_deci(is_deci), .is_neg(is_negB3),
-        .int_part(int_part_B3), .deci_part(deci_part_B3), .neg_sign(neg_signB3),
-        .b4(b4B3), .b3(b3B3), .b2(b2B3), .b1(b1B3), .b0(b0B3), .b_1(b_1B3), .b_2(b_2B3)
+        .is_neg(is_negB3),
+        .int_part(int_part_B3), .neg_sign(neg_signB3),
+        .b4(b4B3), .b3(b3B3)
     );
     
     // ----- C3 -----
     num_gen C3 (
         .digit_in(digit_in), .add(addC3), .clear(clearC3), .CLOCK(CLOCK),
-        .is_deci(is_deci), .is_neg(is_negC3),
-        .int_part(int_part_C3), .deci_part(deci_part_C3), .neg_sign(neg_signC3),
-        .b4(b4C3), .b3(b3C3), .b2(b2C3), .b1(b1C3), .b0(b0C3), .b_1(b_1C3), .b_2(b_2C3)
+        .is_neg(is_negC3),
+        .int_part(int_part_C3), .neg_sign(neg_signC3),
+        .b4(b4C3), .b3(b3C3)
     );
     
-    num_gen D1 (
-        .digit_in(digit_in),
-        .add(addD1),
-        .clear(clearD1),
-        .CLOCK(CLOCK),
-        .is_deci(is_deci),
-        .is_neg(is_negD1),
-        .int_part(int_part_D1),
-        .deci_part(deci_part_D1),
-        .neg_sign(neg_signD1),
-        .b4(b4D1), .b3(b3D1), .b2(b2D1), .b1(b1D1),
-        .b0(b0D1), .b_1(b_1D1), .b_2(b_2D1)
-    );
-    
-    num_gen D2 (
-        .digit_in(digit_in),
-        .add(addD2),
-        .clear(clearD2),
-        .CLOCK(CLOCK),
-        .is_deci(is_deci),
-        .is_neg(is_negD2),
-        .int_part(int_part_D2),
-        .deci_part(deci_part_D2),
-        .neg_sign(neg_signD2),
-        .b4(b4D2), .b3(b3D2), .b2(b2D2), .b1(b1D2),
-        .b0(b0D2), .b_1(b_1D2), .b_2(b_2D2)
-    );
-    
-    num_gen D3 (
-        .digit_in(digit_in),
-        .add(addD3),
-        .clear(clearD3),
-        .CLOCK(CLOCK),
-        .is_deci(is_deci),
-        .is_neg(is_negD3),
-        .int_part(int_part_D3),
-        .deci_part(deci_part_D3),
-        .neg_sign(neg_signD3),
-        .b4(b4D3), .b3(b3D3), .b2(b2D3), .b1(b1D3),
-        .b0(b0D3), .b_1(b_1D3), .b_2(b_2D3)
-    );
 
 
 
@@ -356,7 +327,17 @@ module scene_controller(
             
             eqnmenu:begin
             pixel_array[dot_y][dot_x] <= 8'd36;
-            dot_y <= (dot_y > 3) ? dot_y - 3 : dot_y;
+            dot_y <= (dot_y == 11) ? dot_y - 2 : (dot_y > 3) ? dot_y - 3 : dot_y;
+            end
+            
+            start:begin
+            pixel_array[dot_y][dot_x] <= 8'd36;
+            dot_y <= (dot_y > 7) ? dot_y - 2 : dot_y;
+            end
+            
+            colour:begin
+            pixel_array[dot_y][dot_x] <= 8'd36;
+            dot_y <= (dot_y > 4) ? dot_y - 2 : dot_y;
             end
            
             default:state <= interstate;  
@@ -376,7 +357,7 @@ module scene_controller(
               end 
               else begin
               pixel_array[dot_y][dot_x] <= 8'd36;
-              dot_y <= (dot_y < 11) ? dot_y + 2: dot_y;
+              dot_y <= (dot_y < 9) ? dot_y + 2: dot_y;
               end
               end
               
@@ -385,11 +366,22 @@ module scene_controller(
               numpad:begin
               pixel_array[dot_y][dot_x] <= 8'd36;
               dot_y <= (dot_y < 11) ? dot_y + 3 : dot_y;
+              dot_x <= (dot_x == 9 && dot_y == 8) ? 5 : dot_x;
               end
               
               eqnmenu:begin
               pixel_array[dot_y][dot_x] <= 8'd36;
-              dot_y <= (dot_y < 9) ? dot_y + 3 : dot_y;
+              dot_y <= (dot_y == 9) ? dot_y + 2 : (dot_y < 9) ? dot_y + 3 : dot_y;
+              end
+              
+              start:begin
+              pixel_array[dot_y][dot_x] <= 8'd36;
+              dot_y <= (dot_y < 9) ? dot_y + 2 : dot_y;
+              end
+              
+              colour:begin
+              pixel_array[dot_y][dot_x] <= 8'd36;
+              dot_y <= (dot_y < 8) ? dot_y + 2 : dot_y;
               end
               
               default:state <= interstate;  
@@ -413,8 +405,7 @@ module scene_controller(
               clearB1 <= 1;
               is_negC1 <= 0;
               clearC1 <= 1;
-              is_negD1 <= 0;
-              clearD1 <= 1;              
+                          
               end
               2:begin
               is_negA2 <= 0;
@@ -423,8 +414,7 @@ module scene_controller(
               clearB2 <= 1;
               is_negC2 <= 0;
               clearC2 <= 1;
-              is_negD2 <= 0;
-              clearD2 <= 1;
+              
               end
               3:begin
               is_negA3 <= 0;
@@ -433,8 +423,7 @@ module scene_controller(
               clearB3 <= 1;
               is_negC3 <= 0;
               clearC3 <= 1;
-              is_negD3 <= 0;
-              clearD3 <= 1;
+              
               end
               default:;
               endcase
@@ -456,9 +445,7 @@ module scene_controller(
                    letter <= 6'd12;
                end
                
-               else if (dot_y == 11 && dot_x == 4) begin
-                  letter <= 6'd13;
-               end
+              
                state <= interstate;
                nextstate <= numpad;
                prevstate <= quadrmenu;
@@ -475,7 +462,7 @@ module scene_controller(
               dot_x <= 4; dot_y <= 5 + (letter - 10) * 2;
               nextstate <= prevstate;
               state <= interstate;
-              is_deci <= 0;             
+                         
               end
               else if (dot_x == 5 && dot_y == 11) begin
               digit_in <= 0;
@@ -490,9 +477,7 @@ module scene_controller(
               if (letter == 6'd12) begin
               addC1 <= 1;
               end
-              if (letter == 6'd13) begin
-              addD1 <= 1;
-              end              
+                           
               end
               2:begin
               if (letter == 6'd10) begin
@@ -504,9 +489,7 @@ module scene_controller(
               if (letter == 6'd12) begin
               addC2 <= 1;
               end
-              if (letter == 6'd13) begin
-              addD2 <= 1;
-              end
+              
               end
               3:begin
               if (letter == 6'd10) begin
@@ -518,9 +501,7 @@ module scene_controller(
               if (letter == 6'd12) begin
               addC3 <= 1;
               end
-              if (letter == 6'd13) begin
-              addD3 <= 1;
-              end
+             
               end
               default:;
               endcase
@@ -538,9 +519,7 @@ module scene_controller(
                       if (letter == 6'd12) begin
                           is_negC1 <= 1;
                       end
-                      if (letter == 6'd13) begin
-                          is_negD1 <= 1;
-                      end
+                      
                   end
                   
                   2: begin
@@ -553,9 +532,7 @@ module scene_controller(
                       if (letter == 6'd12) begin
                           is_negC2 <= 1;
                       end
-                      if (letter == 6'd13) begin
-                          is_negD2 <= 1;
-                      end
+                     
                   end
                   
                   3: begin
@@ -568,9 +545,7 @@ module scene_controller(
                       if (letter == 6'd12) begin
                           is_negC3 <= 1;
                       end
-                      if (letter == 6'd13) begin
-                          is_negD3 <= 1;
-                      end
+                      
                   end
                   
                   default: ;
@@ -582,80 +557,64 @@ module scene_controller(
                   1: begin
                       if (letter == 6'd10) begin
                           clearA1 <= 1;
-                          is_deci <= 0;
+                          
                           is_negA1 <= 0;
                       end
                       if (letter == 6'd11) begin
                           clearB1 <= 1;
-                          is_deci <= 0;
+                          
                           is_negB1 <= 0;
                       end
                       if (letter == 6'd12) begin
                           clearC1 <= 1;
-                          is_deci <= 0;
+                          
                           is_negC1 <= 0;
                       end
-                      if (letter == 6'd13) begin
-                          clearD1 <= 1;
-                          is_deci <= 0;
-                          is_negD1 <= 0;
-                      end
+                      
                   end
               
                   2: begin
                       if (letter == 6'd10) begin
                           clearA2 <= 1;
-                          is_deci <= 0;
+                          
                           is_negA2 <= 0;
                       end
                       if (letter == 6'd11) begin
                           clearB2 <= 1;
-                          is_deci <= 0;
+                          
                           is_negB2 <= 0;
                       end
                       if (letter == 6'd12) begin
                           clearC2 <= 1;
-                          is_deci <= 0;
+                          
                           is_negC2 <= 0;
                       end
-                      if (letter == 6'd13) begin
-                          clearD2 <= 1;
-                          is_deci <= 0;
-                          is_negD2 <= 0;
-                      end
+                      
                   end
               
                   3: begin
                       if (letter == 6'd10) begin
                           clearA3 <= 1;
-                          is_deci <= 0;
+                          
                           is_negA3 <= 0;
                       end
                       if (letter == 6'd11) begin
                           clearB3 <= 1;
-                          is_deci <= 0;
+                          
                           is_negB3 <= 0;
                       end
                       if (letter == 6'd12) begin
                           clearC3 <= 1;
-                          is_deci <= 0;
+                          
                           is_negC3 <= 0;
                       end
-                      if (letter == 6'd13) begin
-                          clearD3 <= 1;
-                          is_deci <= 0;
-                          is_negD3 <= 0;
-                     end
+                      
                   end
               
                   default: ;
               endcase
 
 
-              end
-              
-              else if (dot_x == 9 && dot_y == 11) begin
-              is_deci <= 1;
               end
               
               else begin
@@ -671,9 +630,7 @@ module scene_controller(
                       if (letter == 6'd12) begin
                           addC1 <= 1;
                       end
-                      if (letter == 6'd13) begin
-                          addD1 <= 1;
-                      end
+                      
                   end
               
                   2: begin
@@ -686,9 +643,7 @@ module scene_controller(
                       if (letter == 6'd12) begin
                           addC2 <= 1;
                       end
-                      if (letter == 6'd13) begin
-                          addD2 <= 1;
-                      end
+                      
                   end
               
                   3: begin
@@ -701,9 +656,7 @@ module scene_controller(
                       if (letter == 6'd12) begin
                           addC3 <= 1;
                       end
-                      if (letter == 6'd13) begin
-                         addD3 <= 1;
-                      end
+                      
                   end
               
                   default: ;
@@ -714,40 +667,50 @@ module scene_controller(
               end
               
               eqnmenu:begin
+              if (dot_y == 11) begin
+              state <= interstate;
+              nextstate <= start;
+              dot_x <= 4;
+              dot_y <= 7;
+              end else begin
 
               eqn <= dot_y / 3;
               state <= interstate;
               nextstate <= quadrmenu;
               dot_x <= 1;
               dot_y <= 1;
+              end
 
+              end
               
+              start:begin
+              if (dot_y == 7) begin
+              state <= interstate;
+              nextstate <= eqnmenu;
+              dot_x <= 1;
+              dot_y <= 3;
+              end
+              else if (dot_y == 9) begin
+              state <= interstate;
+              nextstate <= colour;
+              dot_x <= 1;
+              dot_y <= 4;
+              end
+              end
               
-              
-//              else if (dot_x == 16) begin
-//              case(dot_y)
-//              3:begin 
-//              enable1 <= 0; clearA1 <= 1;
-//              clearB1 <= 1; clearC1 <= 1;
-//              is_negA1 <= 0; is_negB1 <= 0;
-//              is_negC1 <= 0;
-//              end
-//              6:begin
-//              enable2 <= 0; clearA2 <= 1;
-//              clearB2 <= 1; clearC2 <= 1;
-//              is_negA2 <= 0; is_negB2 <= 0;
-//              is_negC2 <= 0;
-//              end
-//              9:begin
-//              enable3 <= 0; clearA3 <= 1;
-//              clearB3 <= 1; clearC3 <= 1;
-//              is_negA3 <= 0; is_negB3 <= 0;
-//              is_negC3 <= 0;
-//              end
-//              default:;
-//              endcase
-//              end
-              
+              colour:begin
+              if (dot_y == 4) begin
+              text_state <= (text_state == 2'd3) ? 0 : text_state + 1;
+              end
+              else if (dot_y == 6) begin
+              back_state <= (back_state == 2'd3) ? 0 : back_state + 1;
+              end
+              else if (dot_y == 8) begin
+              state <= interstate;
+              nextstate <= start;
+              dot_x <= 4;
+              dot_y <= 9;
+              end
               end
               
               default:state <= interstate;
@@ -768,7 +731,7 @@ module scene_controller(
              
               numpad:begin
               pixel_array[dot_y][dot_x] <= 8'd36;
-              dot_x <= (dot_y < 8) ? ((dot_x < 9) ? dot_x + 4 : dot_x) : ((dot_x < 13) ? dot_x + 4 : dot_x);
+              dot_x <= (dot_y == 11 && dot_x == 5) ? dot_x + 8 : (dot_y < 8) ? ((dot_x < 9) ? dot_x + 4 : dot_x) : ((dot_x < 13) ? dot_x + 4 : dot_x);
               end
               
               
@@ -793,7 +756,7 @@ module scene_controller(
               
               numpad:begin
               pixel_array[dot_y][dot_x] <= 8'd36;
-              dot_x <= (dot_x > 1) ? dot_x - 4 : dot_x;
+              dot_x <= (dot_x == 13 && dot_y == 11) ? dot_x - 8 : (dot_x > 1) ? dot_x - 4 : dot_x;
               end
               
               
@@ -817,103 +780,66 @@ module scene_controller(
             pixel_array[dot_y][dot_x] <= 8'd37;
             
             
-            //y=ax^3+bx^2+cx+d
-            pixel_array[3][1] <= 8'd34;pixel_array[3][2] <= 8'd43;
-            pixel_array[3][3] <= 8'd10;
-            pixel_array[3][4] <= 8'd33;pixel_array[3][5] <= 8'd42;
-            pixel_array[3][6] <= 8'd3;pixel_array[3][7] <= 8'd38;
-            pixel_array[3][8] <= 8'd11;pixel_array[3][9] <= 8'd33;
-            pixel_array[3][10] <= 8'd42;pixel_array[3][11] <= 8'd2;
-            pixel_array[3][12] <= 8'd38;pixel_array[3][13] <= 8'd12;
-            pixel_array[3][14] <= 8'd33;pixel_array[3][15] <= 8'd38;
-            pixel_array[3][16] <= 8'd13;
+            //y=ax^2+bx+c
+            pixel_array[3][2] <= 8'd34;pixel_array[3][3] <= 8'd43;
+            pixel_array[3][4] <= 8'd10;pixel_array[3][5] <= 8'd33;
+            pixel_array[3][6] <= 8'd42;pixel_array[3][7] <= 8'd2;
+            pixel_array[3][8] <= 8'd38;pixel_array[3][9] <= 8'd11;
+            pixel_array[3][10] <= 8'd33;pixel_array[3][11] <= 8'd38;
+            pixel_array[3][12] <= 8'd12;
             //a=
             pixel_array[5][6] <= 8'd10;pixel_array[5][7] <= 8'd43;
             //b=
             pixel_array[7][6] <= 8'd11;pixel_array[7][7] <= 8'd43;
             //c=
             pixel_array[9][6] <= 8'd12;pixel_array[9][7] <= 8'd43;
-            //d=
-            pixel_array[11][6] <= 8'd13;pixel_array[11][7] <= 8'd43;
+            
             
             // DISPLAY THE NUM
             case(eqn)
                 1: begin
                     // A1
-                    pixel_array[5][9]  <= b4A1; pixel_array[5][10]  <= b3A1;
-                    pixel_array[5][11] <= b2A1; pixel_array[5][12]  <= b1A1;
-                    pixel_array[5][13] <= b0A1; pixel_array[5][14]  <= b_1A1;
-                    pixel_array[5][15] <= b_2A1; pixel_array[5][8]  <= neg_signA1;
+                    pixel_array[5][9]  <= b4A1; pixel_array[5][10]  <= b3A1;                   
+                    pixel_array[5][8]  <= neg_signA1;
             
                     // B1
                     pixel_array[7][9]  <= b4B1; pixel_array[7][10]  <= b3B1;
-                    pixel_array[7][11] <= b2B1; pixel_array[7][12]  <= b1B1;
-                    pixel_array[7][13] <= b0B1; pixel_array[7][14]  <= b_1B1;
-                    pixel_array[7][15] <= b_2B1; pixel_array[7][8]  <= neg_signB1;
+                    pixel_array[7][8]  <= neg_signB1;
             
                     // C1
                     pixel_array[9][9]  <= b4C1; pixel_array[9][10]  <= b3C1;
-                    pixel_array[9][11] <= b2C1; pixel_array[9][12]  <= b1C1;
-                    pixel_array[9][13] <= b0C1; pixel_array[9][14]  <= b_1C1;
-                    pixel_array[9][15] <= b_2C1; pixel_array[9][8]  <= neg_signC1;
+                    pixel_array[9][8]  <= neg_signC1;
             
-                    // D1
-                    pixel_array[11][9]  <= b4D1; pixel_array[11][10]  <= b3D1;
-                    pixel_array[11][11] <= b2D1; pixel_array[11][12]  <= b1D1;
-                    pixel_array[11][13] <= b0D1; pixel_array[11][14]  <= b_1D1;
-                    pixel_array[11][15] <= b_2D1; pixel_array[11][8]  <= neg_signD1;
                 end
             
                 2: begin
                     // A2
                     pixel_array[5][9]  <= b4A2; pixel_array[5][10]  <= b3A2;
-                    pixel_array[5][11] <= b2A2; pixel_array[5][12]  <= b1A2;
-                    pixel_array[5][13] <= b0A2; pixel_array[5][14]  <= b_1A2;
-                    pixel_array[5][15] <= b_2A2; pixel_array[5][8]  <= neg_signA2;
+                    pixel_array[5][8]  <= neg_signA2;
             
                     // B2
                     pixel_array[7][9]  <= b4B2; pixel_array[7][10]  <= b3B2;
-                    pixel_array[7][11] <= b2B2; pixel_array[7][12]  <= b1B2;
-                    pixel_array[7][13] <= b0B2; pixel_array[7][14]  <= b_1B2;
-                    pixel_array[7][15] <= b_2B2; pixel_array[7][8]  <= neg_signB2;
+                    pixel_array[7][8]  <= neg_signB2;
             
                     // C2
                     pixel_array[9][9]  <= b4C2; pixel_array[9][10]  <= b3C2;
-                    pixel_array[9][11] <= b2C2; pixel_array[9][12]  <= b1C2;
-                    pixel_array[9][13] <= b0C2; pixel_array[9][14]  <= b_1C2;
-                    pixel_array[9][15] <= b_2C2; pixel_array[9][8]  <= neg_signC2;
+                    pixel_array[9][8]  <= neg_signC2;
             
-                    // D2
-                    pixel_array[11][9]  <= b4D2; pixel_array[11][10]  <= b3D2;
-                    pixel_array[11][11] <= b2D2; pixel_array[11][12]  <= b1D2;
-                    pixel_array[11][13] <= b0D2; pixel_array[11][14]  <= b_1D2;
-                    pixel_array[11][15] <= b_2D2; pixel_array[11][8]  <= neg_signD2;
                 end
             
                 3: begin
                     // A3
                     pixel_array[5][9]  <= b4A3; pixel_array[5][10]  <= b3A3;
-                    pixel_array[5][11] <= b2A3; pixel_array[5][12]  <= b1A3;
-                    pixel_array[5][13] <= b0A3; pixel_array[5][14]  <= b_1A3;
-                    pixel_array[5][15] <= b_2A3; pixel_array[5][8]  <= neg_signA3;
+                    pixel_array[5][8]  <= neg_signA3;
             
                     // B3
                     pixel_array[7][9]  <= b4B3; pixel_array[7][10]  <= b3B3;
-                    pixel_array[7][11] <= b2B3; pixel_array[7][12]  <= b1B3;
-                    pixel_array[7][13] <= b0B3; pixel_array[7][14]  <= b_1B3;
-                    pixel_array[7][15] <= b_2B3; pixel_array[7][8]  <= neg_signB3;
+                    pixel_array[7][8]  <= neg_signB3;
             
                     // C3
                     pixel_array[9][9]  <= b4C3; pixel_array[9][10]  <= b3C3;
-                    pixel_array[9][11] <= b2C3; pixel_array[9][12]  <= b1C3;
-                    pixel_array[9][13] <= b0C3; pixel_array[9][14]  <= b_1C3;
-                    pixel_array[9][15] <= b_2C3; pixel_array[9][8]  <= neg_signC3;
+                    pixel_array[9][8]  <= neg_signC3;
             
-                    // D3
-                    pixel_array[11][9]  <= b4D3; pixel_array[11][10]  <= b3D3;
-                    pixel_array[11][11] <= b2D3; pixel_array[11][12] <= b1D3;
-                    pixel_array[11][13] <= b0D3; pixel_array[11][14] <= b_1D3;
-                    pixel_array[11][15] <= b_2D3; pixel_array[11][8]  <= neg_signD3;
                 end
             
                 default: ;
@@ -929,7 +855,7 @@ module scene_controller(
             pixel_array[5][7] <= 8'd5;pixel_array[5][11] <= 8'd6;
             pixel_array[8][3] <= 8'd7;pixel_array[8][7] <= 8'd8;
             pixel_array[8][11] <= 8'd9;pixel_array[11][3] <= 8'd39;
-            pixel_array[11][7] <= 8'd0;pixel_array[11][11] <= 8'd44;
+            pixel_array[11][7] <= 8'd0;
             pixel_array[8][15] <= 8'd28;pixel_array[8][16] <= 8'd14;
             pixel_array[8][17] <= 8'd29;pixel_array[11][15] <= 8'd12;
             pixel_array[11][16] <= 8'd21;pixel_array[11][17] <= 8'd27;
@@ -940,24 +866,9 @@ module scene_controller(
             addA1 <= 0; addB1 <= 0; addC1 <= 0;
             addA2 <= 0; addB2 <= 0; addC2 <= 0;
             addA3 <= 0; addB3 <= 0; addC3 <= 0;
-            addD1 <= 0; addD2 <= 0; addD3 <= 0;        
+                   
             
-            //D
-            if (is_deci) begin
-            pixel_array[0][13] <= 8'd45;pixel_array[0][14] <= 8'd45;
-            pixel_array[1][13] <= 8'd45;pixel_array[1][15] <= 8'd45;
-            pixel_array[2][13] <= 8'd45;pixel_array[2][16] <= 8'd45;
-            pixel_array[3][13] <= 8'd45;pixel_array[3][16] <= 8'd45;
-            pixel_array[4][13] <= 8'd45;pixel_array[4][15] <= 8'd45;
-            pixel_array[5][13] <= 8'd45;pixel_array[5][14] <= 8'd45;
-            end else begin
-            pixel_array[0][13] <= 8'd36;pixel_array[0][14] <= 8'd36;
-            pixel_array[1][13] <= 8'd36;pixel_array[1][15] <= 8'd36;
-            pixel_array[2][13] <= 8'd36;pixel_array[2][16] <= 8'd36;
-            pixel_array[3][13] <= 8'd36;pixel_array[3][16] <= 8'd36;
-            pixel_array[4][13] <= 8'd36;pixel_array[4][15] <= 8'd36;
-            pixel_array[5][13] <= 8'd36;pixel_array[5][14] <= 8'd36;
-            end  
+           
             
             //letter
             pixel_array[0][1] <= letter; pixel_array[0][2] <= 8'd43;
@@ -965,23 +876,17 @@ module scene_controller(
             case(eqn)
             1:begin
             pixel_array[0][4] <= b4A1; pixel_array[0][5] <= b3A1;
-            pixel_array[0][6] <= b2A1; pixel_array[0][7] <= b1A1;
-            pixel_array[0][8] <= b0A1; pixel_array[0][9] <= b_1A1;
-            pixel_array[0][10] <= b_2A1; pixel_array[0][3] <= neg_signA1;
+            pixel_array[0][3] <= neg_signA1;
             end
             
             2:begin
             pixel_array[0][4] <= b4A2; pixel_array[0][5] <= b3A2;
-            pixel_array[0][6] <= b2A2; pixel_array[0][7] <= b1A2;
-            pixel_array[0][8] <= b0A2; pixel_array[0][9] <= b_1A2;
-            pixel_array[0][10] <= b_2A2; pixel_array[0][3] <= neg_signA2;
+            pixel_array[0][3] <= neg_signA2;
             end
             
             3:begin
             pixel_array[0][4] <= b4A3; pixel_array[0][5] <= b3A3;
-            pixel_array[0][6] <= b2A3; pixel_array[0][7] <= b1A3;
-            pixel_array[0][8] <= b0A3; pixel_array[0][9] <= b_1A3;
-            pixel_array[0][10] <= b_2A3; pixel_array[0][3] <= neg_signA3;
+            pixel_array[0][3] <= neg_signA3;
             end
             default:;
             endcase
@@ -991,23 +896,17 @@ module scene_controller(
                 case(eqn)
                     1: begin
                         pixel_array[0][4] <= b4B1; pixel_array[0][5] <= b3B1;
-                        pixel_array[0][6] <= b2B1; pixel_array[0][7] <= b1B1;
-                        pixel_array[0][8] <= b0B1; pixel_array[0][9] <= b_1B1;
-                        pixel_array[0][10] <= b_2B1; pixel_array[0][3] <= neg_signB1;
+                        pixel_array[0][3] <= neg_signB1;
                     end
             
                     2: begin
                         pixel_array[0][4] <= b4B2; pixel_array[0][5] <= b3B2;
-                        pixel_array[0][6] <= b2B2; pixel_array[0][7] <= b1B2;
-                        pixel_array[0][8] <= b0B2; pixel_array[0][9] <= b_1B2;
-                        pixel_array[0][10] <= b_2B2; pixel_array[0][3] <= neg_signB2;
+                        pixel_array[0][3] <= neg_signB2;
                     end
             
                     3: begin
                         pixel_array[0][4] <= b4B3; pixel_array[0][5] <= b3B3;
-                        pixel_array[0][6] <= b2B3; pixel_array[0][7] <= b1B3;
-                        pixel_array[0][8] <= b0B3; pixel_array[0][9] <= b_1B3;
-                        pixel_array[0][10] <= b_2B3; pixel_array[0][3] <= neg_signB3;
+                        pixel_array[0][3] <= neg_signB3;
                     end
                     default: ;
                 endcase
@@ -1017,56 +916,22 @@ module scene_controller(
                 case(eqn)
                     1: begin
                         pixel_array[0][4] <= b4C1; pixel_array[0][5] <= b3C1;
-                        pixel_array[0][6] <= b2C1; pixel_array[0][7] <= b1C1;
-                        pixel_array[0][8] <= b0C1; pixel_array[0][9] <= b_1C1;
-                        pixel_array[0][10] <= b_2C1; pixel_array[0][3] <= neg_signC1;
+                        pixel_array[0][3] <= neg_signC1;
                     end
             
                     2: begin
                         pixel_array[0][4] <= b4C2; pixel_array[0][5] <= b3C2;
-                        pixel_array[0][6] <= b2C2; pixel_array[0][7] <= b1C2;
-                        pixel_array[0][8] <= b0C2; pixel_array[0][9] <= b_1C2;
-                        pixel_array[0][10] <= b_2C2; pixel_array[0][3] <= neg_signC2;
+                        pixel_array[0][3] <= neg_signC2;
                     end
             
                     3: begin
                         pixel_array[0][4] <= b4C3; pixel_array[0][5] <= b3C3;
-                        pixel_array[0][6] <= b2C3; pixel_array[0][7] <= b1C3;
-                        pixel_array[0][8] <= b0C3; pixel_array[0][9] <= b_1C3;
-                        pixel_array[0][10] <= b_2C3; pixel_array[0][3] <= neg_signC3;
+                        pixel_array[0][3] <= neg_signC3;
                     end
                     default: ;
                 endcase
             end
-            
-            if (letter == 8'd13) begin
-                case(eqn)
-                    1: begin
-                        pixel_array[0][4]  <= b4D1; pixel_array[0][5]  <= b3D1;
-                        pixel_array[0][6]  <= b2D1; pixel_array[0][7]  <= b1D1;
-                        pixel_array[0][8]  <= b0D1; pixel_array[0][9]  <= b_1D1;
-                        pixel_array[0][10] <= b_2D1; pixel_array[0][3]  <= neg_signD1;
-                    end
-            
-                    2: begin
-                        pixel_array[0][4]  <= b4D2; pixel_array[0][5]  <= b3D2;
-                        pixel_array[0][6]  <= b2D2; pixel_array[0][7]  <= b1D2;
-                        pixel_array[0][8]  <= b0D2; pixel_array[0][9]  <= b_1D2;
-                        pixel_array[0][10] <= b_2D2; pixel_array[0][3]  <= neg_signD2;
-                    end
-            
-                    3: begin
-                        pixel_array[0][4]  <= b4D3; pixel_array[0][5]  <= b3D3;
-                        pixel_array[0][6]  <= b2D3; pixel_array[0][7]  <= b1D3;
-                        pixel_array[0][8]  <= b0D3; pixel_array[0][9]  <= b_1D3;
-                        pixel_array[0][10] <= b_2D3; pixel_array[0][3]  <= neg_signD3;
-                    end
-            
-                    default: ;
-                endcase
-            end
-
-         
+          
             end
             
             eqnmenu: begin
@@ -1100,7 +965,84 @@ module scene_controller(
             pixel_array[9][7] <= 8'd29; pixel_array[9][8] <= 8'd18;
             pixel_array[9][9] <= 8'd24; pixel_array[9][10] <= 8'd23;
             pixel_array[9][12] <= 8'd3;
+            
+            //back
+            pixel_array[11][3] <= 8'd11; pixel_array[11][4] <= 8'd10;
+            pixel_array[11][5] <= 8'd12; pixel_array[11][6] <= 8'd20;
                         
+            end
+            
+            start:begin
+            //FP big big
+            pixel_array[1][2] <= 8'd45; pixel_array[1][3] <= 8'd45;
+             pixel_array[1][4] <= 8'd45;
+            pixel_array[1][6] <= 8'd45; pixel_array[1][7] <= 8'd45;
+            pixel_array[1][8] <= 8'd45; pixel_array[2][2] <= 8'd45;
+            pixel_array[2][6] <= 8'd45; pixel_array[2][9] <= 8'd45;
+            pixel_array[3][2] <= 8'd45; pixel_array[3][3] <= 8'd45;
+            pixel_array[3][4] <= 8'd45; pixel_array[3][6] <= 8'd45;
+            pixel_array[3][7] <= 8'd45; pixel_array[3][8] <= 8'd45;
+            pixel_array[4][2] <= 8'd45; pixel_array[4][6] <= 8'd45;
+            pixel_array[5][6] <= 8'd45; pixel_array[5][6] <= 8'd45;
+            
+            //graph
+            pixel_array[5][10] <= 8'd16; pixel_array[5][11] <= 8'd27;
+            pixel_array[5][12] <= 8'd10; pixel_array[5][13] <= 8'd25;
+            pixel_array[5][14] <= 8'd17;
+            
+            //dot
+            pixel_array[dot_y][dot_x] <= 8'd37;
+            
+            //start
+            pixel_array[7][6] <= 8'd28; pixel_array[7][7] <= 8'd29;
+            pixel_array[7][8] <= 8'd10; pixel_array[7][9] <= 8'd27;
+            pixel_array[7][10] <= 8'd29;
+            
+            //options
+            pixel_array[9][6] <= 8'd24; pixel_array[9][7] <= 8'd25;
+            pixel_array[9][8] <= 8'd29; pixel_array[9][9] <= 8'd18;
+            pixel_array[9][10] <= 8'd24; pixel_array[9][11] <= 8'd23;
+            pixel_array[9][12] <= 8'd28;
+
+            end
+            
+            colour:begin
+            //dot
+            pixel_array[dot_y][dot_x] <= 8'd37;
+            //colour text
+            pixel_array[3][10] <= (text_state == 0) ? 8'd32 : 
+            (text_state == 1) ? 8'd16 : 
+            (text_state == 2) ? 8'd27 : 8'd12;
+            
+            //colour back
+            pixel_array[6][10] <= (text_state == 0) ? 8'd11 : 
+            (text_state == 1) ? 8'd11 : 
+            (text_state == 2) ? 8'd16 : 8'd24;
+            pixel_array[6][11] <= (text_state == 0) ? 8'd21 : 8'd36;
+            pixel_array[6][12] <= (text_state == 0) ? 8'd20 : 8'd30;
+            
+            //colour select
+            pixel_array[1][3] <= 8'd12; pixel_array[1][4] <= 8'd24;
+            pixel_array[1][5] <= 8'd21; pixel_array[1][6] <= 8'd24;
+            pixel_array[1][7] <= 8'd30; pixel_array[1][8] <= 8'd27;
+            pixel_array[1][11] <= 8'd14; pixel_array[1][10] <= 8'd28;
+            pixel_array[1][13] <= 8'd14; pixel_array[1][12] <= 8'd21;
+            pixel_array[1][15] <= 8'd29; pixel_array[1][14] <= 8'd12;
+            
+            //background
+            pixel_array[3][3] <= 8'd11; pixel_array[3][4] <= 8'd10;
+            pixel_array[3][5] <= 8'd12; pixel_array[3][6] <= 8'd20;
+            pixel_array[4][3] <= 8'd16; pixel_array[4][4] <= 8'd27;
+            pixel_array[4][5] <= 8'd24; pixel_array[4][6] <= 8'd30;
+            pixel_array[4][7] <= 8'd23; pixel_array[4][8] <= 8'd13;
+            
+            //text
+            pixel_array[6][3] <= 8'd29; pixel_array[6][4] <= 8'd14;
+            pixel_array[6][5] <= 8'd33; pixel_array[6][6] <= 8'd29;
+            
+            //back
+            pixel_array[8][3] <= 8'd11; pixel_array[8][4] <= 8'd10;
+            pixel_array[8][5] <= 8'd13; pixel_array[8][6] <= 8'd20;
             end
 
             default: state <= interstate;
@@ -1109,7 +1051,7 @@ module scene_controller(
                        clearA1 <= 0; clearB1 <= 0; clearC1 <= 0;
                        clearA2 <= 0; clearB2 <= 0; clearC2 <= 0;
                        clearA3 <= 0; clearB3 <= 0; clearC3 <= 0;
-                       clearD1 <= 0; clearD2 <= 0; clearD3 <= 0;
+                       
             end
             
            
@@ -1125,6 +1067,15 @@ module scene_controller(
     //assign array_out = (x_cor > end_x || y_cor > end_y || x_cor < start_x || y_cor < start_y) ? 0 : pixel_array[0][0];
     always @ (posedge CLOCK) begin
        array_out <= (x_cor > end_x || y_cor > end_y || x_cor < start_x || y_cor < start_y) ? 8'd36 : pixel_array[y][x];
+//       text_colour <= (text_state == 0) ? white :
+//        (text_state == 1) ? green : 
+//        (text_state == 2) ? red : 
+//        cyan;
+        
+//        back_colour <= (back_state == 0) ? black : 
+//        (back_state == 1) ? blue :
+//        (back_state == 2) ? grey : 
+//        orange;
     end
     
 endmodule
