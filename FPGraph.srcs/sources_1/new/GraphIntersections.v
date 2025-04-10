@@ -5,40 +5,46 @@ module GraphIntersections(
     output led0
 );
 
+reg startCalculate = 0;
+
+always @ (basysClock) begin
+    startCalculate <= 1;
+end
+
     // Instantiate the LineIntercepts module with basysClock passed in and all other inputs tied to 0.
     LineIntercepts u_LineIntercepts (
         .basysClock     (basysClock),
-        .startCalculate (1'b0),
+        .startCalculate (startCalculate),
         // Graph 1 Equation Inputs
-        .a1Sign         (1'b0),
-        .a1Integer      (24'd0),
-        .a1Decimal      (24'd0),
-        .b1Sign         (1'b0),
-        .b1Integer      (24'd0),
-        .b1Decimal      (24'd0),
-        .c1Sign         (1'b0),
-        .c1Integer      (24'd0),
-        .c1Decimal      (24'd0),
+        .a1Sign         (0),
+        .a1Integer      (0),
+        .a1Decimal      (0),
+        .b1Sign         (0),
+        .b1Integer      (0),
+        .b1Decimal      (0),
+        .c1Sign         (0),
+        .c1Integer      (0),
+        .c1Decimal      (0),
         // Graph 2 Equation Inputs
-        .a2Sign         (1'b0),
-        .a2Integer      (24'd0),
-        .a2Decimal      (24'd0),
-        .b2Sign         (1'b0),
-        .b2Integer      (24'd0),
-        .b2Decimal      (24'd0),
-        .c2Sign         (1'b0),
-        .c2Integer      (24'd0),
-        .c2Decimal      (24'd0),
+        .a2Sign         (0),
+        .a2Integer      (0),
+        .a2Decimal      (0),
+        .b2Sign         (0),
+        .b2Integer      (0),
+        .b2Decimal      (0),
+        .c2Sign         (0),
+        .c2Integer      (0),
+        .c2Decimal      (0),
         // Graph 3 Equation Inputs
-        .a3Sign         (1'b0),
-        .a3Integer      (24'd0),
-        .a3Decimal      (24'd0),
-        .b3Sign         (1'b0),
-        .b3Integer      (24'd0),
-        .b3Decimal      (24'd0),
-        .c3Sign         (1'b0),
-        .c3Integer      (24'd0),
-        .c3Decimal      (24'd0),
+        .a3Sign         (0),
+        .a3Integer      (0),
+        .a3Decimal      (0),
+        .b3Sign         (0),
+        .b3Integer      (0),
+        .b3Decimal      (0),
+        .c3Sign         (0),
+        .c3Integer      (0),
+        .c3Decimal      (0),
         // Graph 1 & 2 Intersections Outputs
         .g1g2_X1Sign    (led0),
         .g1g2_X1Int     ( ),

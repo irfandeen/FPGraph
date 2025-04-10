@@ -8,71 +8,71 @@ module LineIntercepts(
 
     //-----------------Graph Equation Inputs-------------------
     input                a1Sign,
-    input       [23:0]   a1Integer, a1Decimal,
+    input       [13:0]   a1Integer, a1Decimal,
     input                b1Sign,
-    input       [23:0]   b1Integer, b1Decimal,
+    input       [13:0]   b1Integer, b1Decimal,
     input                c1Sign,
-    input       [23:0]   c1Integer, c1Decimal,
+    input       [13:0]   c1Integer, c1Decimal,
 
     input                a2Sign,
-    input       [23:0]   a2Integer, a2Decimal,
+    input       [13:0]   a2Integer, a2Decimal,
     input                b2Sign,
-    input       [23:0]   b2Integer, b2Decimal,
+    input       [13:0]   b2Integer, b2Decimal,
     input                c2Sign,
-    input       [23:0]   c2Integer, c2Decimal,
+    input       [13:0]   c2Integer, c2Decimal,
 
     input                a3Sign,
-    input       [23:0]   a3Integer, a3Decimal,
+    input       [13:0]   a3Integer, a3Decimal,
     input                b3Sign,
-    input       [23:0]   b3Integer, b3Decimal,
+    input       [13:0]   b3Integer, b3Decimal,
     input                c3Sign,
-    input       [23:0]   c3Integer, c3Decimal,
+    input       [13:0]   c3Integer, c3Decimal,
     //---------------------------------------------------------
 
     //---------------Graph 1 Graph 2 Intercepts----------------
     output           g1g2_X1Sign,
-    output  [23:0]   g1g2_X1Int, g1g2_X1Dec,
+    output  [13:0]   g1g2_X1Int, g1g2_X1Dec,
 
     output           g1g2_Y1Sign,
-    output  [23:0]   g1g2_Y1Int, g1g2_Y1Dec,
+    output  [13:0]   g1g2_Y1Int, g1g2_Y1Dec,
 
     output           g1g2_X2Sign,
-    output  [23:0]   g1g2_X2Int, g1g2_X2Dec,
+    output  [13:0]   g1g2_X2Int, g1g2_X2Dec,
 
     output           g1g2_Y2Sign,
-    output  [23:0]   g1g2_Y2Int, g1g2_Y2Dec,
+    output  [13:0]   g1g2_Y2Int, g1g2_Y2Dec,
 
     output           g1g2_isCalculated,
     //---------------------------------------------------------
 
     //---------------Graph 1 Graph 3 Intercepts----------------
     output           g1g3_X1Sign,
-    output  [23:0]   g1g3_X1Int, g1g3_X1Dec,
+    output  [13:0]   g1g3_X1Int, g1g3_X1Dec,
 
     output           g1g3_Y1Sign,
-    output  [23:0]   g1g3_Y1Int, g1g3_Y1Dec,
+    output  [13:0]   g1g3_Y1Int, g1g3_Y1Dec,
 
     output           g1g3_X2Sign,
-    output  [23:0]   g1g3_X2Int, g1g3_X2Dec,
+    output  [13:0]   g1g3_X2Int, g1g3_X2Dec,
 
     output           g1g3_Y2Sign,
-    output  [23:0]   g1g3_Y2Int, g1g3_Y2Dec,
+    output  [13:0]   g1g3_Y2Int, g1g3_Y2Dec,
 
     output           g1g3_isCalculated,
     //----------------------------------------------------------
 
     //---------------Graph 2 Graph 3 Intercepts-----------------
     output           g2g3_X1Sign,
-    output  [23:0]   g2g3_X1Int, g2g3_X1Dec,
+    output  [13:0]   g2g3_X1Int, g2g3_X1Dec,
 
     output           g2g3_Y1Sign,
-    output  [23:0]   g2g3_Y1Int, g2g3_Y1Dec,
+    output  [13:0]   g2g3_Y1Int, g2g3_Y1Dec,
 
     output           g2g3_X2Sign,
-    output  [23:0]   g2g3_X2Int, g2g3_X2Dec,
+    output  [13:0]   g2g3_X2Int, g2g3_X2Dec,
 
     output           g2g3_Y2Sign,
-    output  [23:0]   g2g3_Y2Int, g2g3_Y2Dec,
+    output  [13:0]   g2g3_Y2Int, g2g3_Y2Dec,
 
     output           g2g3_isCalculated
     //----------------------------------------------------------

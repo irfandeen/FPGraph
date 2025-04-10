@@ -3,14 +3,14 @@
 module IntersectionQuadratic(
     input         basysClock, startCalculate,
     input         a1Sign, b1Sign, c1Sign, a2Sign, b2Sign, c2Sign,
-    input  [23:0] a1Integer, a1Decimal, 
+    input  [13:0] a1Integer, a1Decimal, 
                   b1Integer, b1Decimal,
                   c1Integer, c1Decimal,
                   a2Integer, a2Decimal,
                   b2Integer, b2Decimal,
                   c2Integer, c2Decimal,
-    output reg    x1Sign, y1Sign, x2Sign, y2Sign,
-    output reg [23:0] x1Integer, x1Decimal,
+        output reg    x1Sign, y1Sign, x2Sign, y2Sign,
+    output reg [13:0] x1Integer, x1Decimal,
                       y1Integer, y1Decimal,
                       x2Integer, x2Decimal,
                       y2Integer, y2Decimal,
@@ -21,15 +21,15 @@ module IntersectionQuadratic(
     output reg [5:0] calculationPhaseDebug,
 
     output reg discSignDebug,
-    output reg [23:0] discIntDebug, discDecDebug,
+    output reg [13:0] discIntDebug, discDecDebug,
 
     output reg isCalculatedRootDebug,
 
     output reg sqrtDiscSignDebug,
-    output reg [23:0] sqrtDiscIntDebug, sqrtDiscDecDebug,
+    output reg [13:0] sqrtDiscIntDebug, sqrtDiscDecDebug,
 
     output reg firstAnsSignDebug,
-    output reg [23:0] firstAnsIntDebug, firstAnsDecDebug
+    output reg [13:0] firstAnsIntDebug, firstAnsDecDebug
     //DEBUG ONLY
     */
 
@@ -42,14 +42,14 @@ module IntersectionQuadratic(
     // FloatingPoint Calculator Signals
     reg         firstValueSign;
     reg         secondValueSign;
-    reg [23:0]  firstValueInteger;
-    reg [23:0]  firstValueDecimal;
-    reg [23:0]  secondValueInteger;
-    reg [23:0]  secondValueDecimal;
+    reg [13:0]  firstValueInteger;
+    reg [13:0]  firstValueDecimal;
+    reg [13:0]  secondValueInteger;
+    reg [13:0]  secondValueDecimal;
     reg [1:0]   operation;
     
-    wire [23:0] finalResultInteger;
-    wire [23:0] finalResultDecimal;
+    wire [13:0] finalResultInteger;
+    wire [13:0] finalResultDecimal;
     wire        finalSign;
     wire        isCalculatedFloating;
     
@@ -69,12 +69,12 @@ module IntersectionQuadratic(
     
     // FloatingSquareRoot Calculator Signals
     reg         sqrtStart;
-    reg [23:0]  sqrtInteger;
-    reg [23:0]  sqrtDecimal;
+    reg [13:0]  sqrtInteger;
+    reg [13:0]  sqrtDecimal;
     
-    wire [23:0] sqrtResultInteger;
-    wire [23:0] sqrtResultDecimal;
-    wire sqrtResultSign;
+    wire [13:0] sqrtResultInteger;
+    wire [13:0] sqrtResultDecimal;
+    wire        sqrtResultSign;
     wire        isCalculatedRoot;
     
     FloatingSquareRoot squareRootCalculator (
@@ -92,103 +92,103 @@ module IntersectionQuadratic(
     // Register section: Intermediate registers for quadratic computation
     // Coefficients
     reg        aSign;
-    reg [23:0] aInt, aDec;
+    reg [13:0] aInt, aDec;
     reg        bSign;
-    reg [23:0] bInt, bDec;
+    reg [13:0] bInt, bDec;
     reg        cSign;
-    reg [23:0] cInt, cDec;
+    reg [13:0] cInt, cDec;
     
     // Intermediate Products and Squares
     reg        acSign;
-    reg [23:0] acInt;
-    reg [23:0] acDec;
+    reg [13:0] acInt;
+    reg [13:0] acDec;
     
     reg        fourAcSign;
-    reg [23:0] fourAcInt;
-    reg [23:0] fourAcDec;
+    reg [13:0] fourAcInt;
+    reg [13:0] fourAcDec;
     
     reg        bSquareSign;
-    reg [23:0] bSquareInt;
-    reg [23:0] bSquareDec;
+    reg [13:0] bSquareInt;
+    reg [13:0] bSquareDec;
     
     // Discriminant
     reg        discSign;
-    reg [23:0] discInt;
-    reg [23:0] discDec;
+    reg [13:0] discInt;
+    reg [13:0] discDec;
     
     // Square root of discriminant
     reg        sqrtDiscSign;
-    reg [23:0] sqrtDiscInt;
-    reg [23:0] sqrtDiscDec;
+    reg [13:0] sqrtDiscInt;
+    reg [13:0] sqrtDiscDec;
     
     // -b value
     reg        minusBSign;
-    reg [23:0] minusBInt;
-    reg [23:0] minusBDec;
+    reg [13:0] minusBInt;
+    reg [13:0] minusBDec;
     
     // 2a value
     reg        twoASign;
-    reg [23:0] twoAInt;
-    reg [23:0] twoADec;
+    reg [13:0] twoAInt;
+    reg [13:0] twoADec;
     
     // Numerators for x solutions
     reg        firstNumeratorSign;
-    reg [23:0] firstNumeratorInt;
-    reg [23:0] firstNumeratorDec;
+    reg [13:0] firstNumeratorInt;
+    reg [13:0] firstNumeratorDec;
     
     reg        secondNumeratorSign;
-    reg [23:0] secondNumeratorInt;
-    reg [23:0] secondNumeratorDec;
+    reg [13:0] secondNumeratorInt;
+    reg [13:0] secondNumeratorDec;
     
     // First x solution and related steps for y calculation
     reg        firstAnsSign;
-    reg [23:0] firstAnsInt;
-    reg [23:0] firstAnsDec;
+    reg [13:0] firstAnsInt;
+    reg [13:0] firstAnsDec;
     
     reg        firstAnsSquareSign;
-    reg [23:0] firstAnsSquareInt;
-    reg [23:0] firstAnsSquareDec;
+    reg [13:0] firstAnsSquareInt;
+    reg [13:0] firstAnsSquareDec;
     
     reg        firstAnsSquareMultiplyASign;
-    reg [23:0] firstAnsSquareMultiplyAInt;
-    reg [23:0] firstAnsSquareMultiplyADec;
+    reg [13:0] firstAnsSquareMultiplyAInt;
+    reg [13:0] firstAnsSquareMultiplyADec;
     
     reg        firstAnsMultiplyBSign;
-    reg [23:0] firstAnsMultiplyBInt;
-    reg [23:0] firstAnsMultiplyBDec;
+    reg [13:0] firstAnsMultiplyBInt;
+    reg [13:0] firstAnsMultiplyBDec;
     
     reg        firstAnsAPlusBSign;
-    reg [23:0] firstAnsAPlusBInt;
-    reg [23:0] firstAnsAPlusBDec;
+    reg [13:0] firstAnsAPlusBInt;
+    reg [13:0] firstAnsAPlusBDec;
     
     reg        firstAnsYSign;
-    reg [23:0] firstAnsYInt;
-    reg [23:0] firstAnsYDec;
+    reg [13:0] firstAnsYInt;
+    reg [13:0] firstAnsYDec;
     
     // Second x solution and related steps for y calculation
     reg        secondAnsSign;
-    reg [23:0] secondAnsInt;
-    reg [23:0] secondAnsDec;
+    reg [13:0] secondAnsInt;
+    reg [13:0] secondAnsDec;
     
     reg        secondAnsSquareSign;
-    reg [23:0] secondAnsSquareInt;
-    reg [23:0] secondAnsSquareDec;
+    reg [13:0] secondAnsSquareInt;
+    reg [13:0] secondAnsSquareDec;
     
     reg        secondAnsSquareMultiplyASign;
-    reg [23:0] secondAnsSquareMultiplyAInt;
-    reg [23:0] secondAnsSquareMultiplyADec;
+    reg [13:0] secondAnsSquareMultiplyAInt;
+    reg [13:0] secondAnsSquareMultiplyADec;
     
     reg        secondAnsMultiplyBSign;
-    reg [23:0] secondAnsMultiplyBInt;
-    reg [23:0] secondAnsMultiplyBDec;
+    reg [13:0] secondAnsMultiplyBInt;
+    reg [13:0] secondAnsMultiplyBDec;
     
     reg        secondAnsAPlusBSign;
-    reg [23:0] secondAnsAPlusBInt;
-    reg [23:0] secondAnsAPlusBDec;
+    reg [13:0] secondAnsAPlusBInt;
+    reg [13:0] secondAnsAPlusBDec;
     
     reg        secondAnsYSign;
-    reg [23:0] secondAnsYInt;
-    reg [23:0] secondAnsYDec;
+    reg [13:0] secondAnsYInt;
+    reg [13:0] secondAnsYDec;
     
     // Control: Calculation Phase
     reg [5:0] calculationPhase = 49;

@@ -3,24 +3,24 @@
 module FloatingPoint(
     input          firstValueSign,
     input          secondValueSign,
-    input [23:0]   firstValueInteger, 
-    input [23:0]   secondValueInteger,
-    input [23:0]   firstValueDecimal,   
-    input [23:0]   secondValueDecimal,  
+    input [13:0]   firstValueInteger, 
+    input [13:0]   secondValueInteger,
+    input [13:0]   firstValueDecimal,   
+    input [13:0]   secondValueDecimal,  
     input [1:0]    operation,
     output         finalSign,
-    output [23:0]  finalResultInteger, 
-    output [23:0]  finalResultDecimal,
+    output [13:0]  finalResultInteger, 
+    output [13:0]  finalResultDecimal,
     output reg isCalculated   
 );
 
-    // Using 24 fractional bits for 6-digit precision:
-    reg signed [48:0] firstValue;
-    reg signed [48:0] secondValue;
+    // Using 14 fractional bits for 4-digit precision:
+    reg signed [28:0] firstValue;
+    reg signed [28:0] secondValue;
     
-    reg signed [98:0] intermediateResult;
+    reg signed [57:0] intermediateResult;
     reg [1:0]         signOverride;
-    wire [46:0] finalResultDecimalUnrounded;
+    wire [28:0] finalResultDecimalUnrounded;
     
     localparam ADD         = 0;
     localparam SUB         = 1;
@@ -35,9 +35,9 @@ module FloatingPoint(
         isCalculated = 0;
         signOverride = NO_OVERRIDE;
     
-        // Build fixed-point values using 24 fractional bits
-        firstValue  = (firstValueInteger << 24) + ((firstValueDecimal << 24) / 1000000);
-        secondValue = (secondValueInteger << 24) + ((secondValueDecimal << 24) / 1000000);
+        // Build fixed-point values using 14 fractional bits
+        firstValue  = (firstValueInteger << 14) + ((firstValueDecimal << 14) / 10000);
+        secondValue = (secondValueInteger << 14) + ((secondValueDecimal << 14) / 10000);
  
         // Evaluate the operation using a case statement with nested if/else
         case (operation)
@@ -82,11 +82,11 @@ module FloatingPoint(
             end
             
             MUL: begin
-                intermediateResult = (firstValue * secondValue) >>> 24;
+                intermediateResult = (firstValue * secondValue) >>> 14;
             end
             
             DIV: begin
-                intermediateResult = (firstValue << 24) / secondValue;
+                intermediateResult = (firstValue << 14) / secondValue;
             end
             
             default: begin
@@ -97,12 +97,12 @@ module FloatingPoint(
         isCalculated = 1; // Set the flag to indicate calculation is done
     end
     
-    // Extract the integer portion from bits [47:24]
-    assign finalResultInteger = intermediateResult[47:24];
+    // Extract the integer portion from bits [27:14]
+    assign finalResultInteger = intermediateResult[27:14];
     
-    // Extract the fractional portion from bits [23:0] and scale it back
-    assign finalResultDecimalUnrounded = ((intermediateResult[23:0] * 1000000) >> 24);
-    assign finalResultDecimal = finalResultDecimalUnrounded[23:0];
+    // Extract the fractional portion from bits [13:0] and scale it back
+    assign finalResultDecimalUnrounded = ((intermediateResult[13:0] * 10000) >> 14);
+    assign finalResultDecimal = finalResultDecimalUnrounded[13:0];
     
     // Final sign is determined by signOverride if set; otherwise, use the XOR of the input signs
     assign finalSign = (signOverride == POS) ? POS :
