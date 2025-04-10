@@ -65,7 +65,7 @@ module FloatingSquareRoot(
     assign resultSign = POS;
 
     reg prevStartCalculate = 0;
-    reg [3:0] state      = 10;
+    reg [3:0] state      = 12;
     reg [3:0] innerState = 0;        
     reg [23:0] guessInteger = 1;
     reg [23:0] guessDecimal;
@@ -138,11 +138,20 @@ module FloatingSquareRoot(
             10: begin
                 resultInteger <= guessInteger;
                 resultDecimal <= guessDecimal;
-                isCalculated  <= 1;
+                state <= 11;
+            end
+
+            11: begin
+                isCalculated <= 1;
+                state <= 12;
+            end
+            
+            12: begin
+            //Do nothing
             end
 
             default: begin
-                state <= 10;
+                state <= 12;
             end
         endcase
     end
