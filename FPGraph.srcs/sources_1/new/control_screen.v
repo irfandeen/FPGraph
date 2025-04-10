@@ -31,13 +31,13 @@ module control_screen(
     input btnu,
     input btnd,
     output reg [15:0] colour_out,
-    output [6:0] int_part_A1, int_part_B1, int_part_C1, int_part_D1,
-                      int_part_A2, int_part_B2, int_part_C2, int_part_D2,
-                      int_part_A3, int_part_B3, int_part_C3, int_part_D3,
+    output [6:0] int_part_A1, int_part_B1, int_part_C1,
+                      int_part_A2, int_part_B2, int_part_C2,
+                      int_part_A3, int_part_B3, int_part_C3,
        
-        output        is_neg_A1, is_neg_B1, is_neg_C1, is_neg_D1,
-                      is_neg_A2, is_neg_B2, is_neg_C2, is_neg_D2,
-                      is_neg_A3, is_neg_B3, is_neg_C3, is_neg_D3
+        output        is_neg_A1, is_neg_B1, is_neg_C1,
+                      is_neg_A2, is_neg_B2, is_neg_C2,
+                      is_neg_A3, is_neg_B3, is_neg_C3
 
     );
     
