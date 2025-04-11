@@ -177,7 +177,7 @@ module IntersectionQuadratic(
     );
     
     // Control: Calculation Phase
-    reg [5:0] calculationPhase = 39;
+    reg [5:0] calculationPhase = 37;
     reg prevStartCalculate = 0;
     
     /* Main Sequential Calculation */

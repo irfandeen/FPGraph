@@ -212,7 +212,7 @@ module LineIntercepts(
                     g1g2_Y2Int <= temp_Y2Int;
                     g1g2_Y2Dec <= temp_Y2Dec;
 
-                    g1g2_isCalculated <= 1; // Indicate that the calculation is done
+                    g1g2_isCalculated <= temp_isCalculated; // Indicate that the calculation is done
                     startIntersectionQuadratic <= 0; 
                     state <= 2;
                 end
@@ -255,7 +255,7 @@ module LineIntercepts(
                     g1g3_Y2Int <= temp_Y2Int;
                     g1g3_Y2Dec <= temp_Y2Dec;
 
-                    g1g3_isCalculated <= 1; // Indicate that the calculation is done
+                    g1g3_isCalculated <= temp_isCalculated; // Indicate that the calculation is done
                     startIntersectionQuadratic <= 0; 
                     state <= 4;
                 end
@@ -298,7 +298,7 @@ module LineIntercepts(
                     g2g3_Y2Int <= temp_Y2Int;
                     g2g3_Y2Dec <= temp_Y2Dec;
 
-                    g2g3_isCalculated <= 1; // Indicate that the calculation is done
+                    g2g3_isCalculated <= temp_isCalculated; // Indicate that the calculation is done
                     startIntersectionQuadratic <= 0; 
                     state <= 6;
                 end
