@@ -34,11 +34,11 @@ module scene_controller(
                   int_part_A2, int_part_B2, int_part_C2,
                   int_part_A3, int_part_B3, int_part_C3,
     
-    output        is_neg_A1, is_neg_B1, is_neg_C1,
-                  is_neg_A2, is_neg_B2, is_neg_C2,
-                  is_neg_A3, is_neg_B3, is_neg_C3
-//    output reg [15:0] text_colour = 16'hFFFF,
-//    output reg [15:0] back_colour = 16'h0000           
+    output reg    is_negA1 = 0, is_negB1 = 0, is_negC1 = 0,
+                  is_negA2 = 0, is_negB2 = 0, is_negC2 = 0,
+                  is_negA3 = 0, is_negB3 = 0, is_negC3 = 0,
+    output reg [15:0] text_colour = 16'hFFFF,
+    output reg [15:0] back_colour = 16'h0000           
 
     
 
@@ -59,7 +59,7 @@ module scene_controller(
     // Debounce counter and period (200ms)
     reg [23:0] debounceCounter = 0;
     //reg prevPushState = 0;
-    localparam DEBOUNCE_PERIOD = 24'd2000000; // 80ms at 25MHz
+    localparam DEBOUNCE_PERIOD = 24'd4000000; // 80ms at 25MHz
     reg btnc_press, btnr_press;
     reg btnl_press, btnu_press;
     reg btnd_press;
@@ -126,47 +126,47 @@ module scene_controller(
     // ----- Instance A1 -----
     //wire [13:0] int_part_A1; wire [6:0] deci_part_A1;
     wire [7:0] b4A1, b3A1, neg_signA1;
-    reg clearA1, is_negA1;
+    reg clearA1;
     
     // ----- Instance B1 -----
     //wire [13:0] int_part_B1; wire [6:0] deci_part_B1;
     wire [7:0] b4B1, b3B1, neg_signB1;
-    reg clearB1, is_negB1;
+    reg clearB1;
     
     // ----- Instance C1 -----
     //wire [13:0] int_part_C1; wire [6:0] deci_part_C1;
     wire [7:0] b4C1, b3C1, neg_signC1;
-    reg clearC1, is_negC1;
+    reg clearC1;
     
     // ----- Instance A2 -----
     //wire [13:0] int_part_A2; wire [6:0] deci_part_A2;
     wire [7:0] b4A2, b3A2, neg_signA2;
-    reg clearA2, is_negA2;
+    reg clearA2;
     
     // ----- Instance B2 -----
     //wire [13:0] int_part_B2; wire [6:0] deci_part_B2;
     wire [7:0] b4B2, b3B2, neg_signB2;
-    reg clearB2, is_negB2;
+    reg clearB2;
     
     // ----- Instance C2 -----
     //wire [13:0] int_part_C2; wire [6:0] deci_part_C2;
     wire [7:0] b4C2, b3C2, neg_signC2;
-    reg clearC2, is_negC2;
+    reg clearC2;
     
     // ----- Instance A3 -----
     //wire [13:0] int_part_A3; wire [6:0] deci_part_A3;
     wire [7:0] b4A3, b3A3, neg_signA3;
-    reg clearA3, is_negA3;
+    reg clearA3;
     
     // ----- Instance B3 -----
     //wire [13:0] int_part_B3; wire [6:0] deci_part_B3;
     wire [7:0] b4B3, b3B3, neg_signB3;
-    reg clearB3, is_negB3;
+    reg clearB3;
     
     // ----- Instance C3 -----
    //wire [13:0] int_part_C3; wire [6:0] deci_part_C3;
     wire [7:0] b4C3, b3C3, neg_signC3;
-    reg clearC3, is_negC3;
+    reg clearC3;
     
     // ----- A1 -----
     num_gen A1 (
@@ -983,7 +983,7 @@ module scene_controller(
             pixel_array[3][4] <= 8'd45; pixel_array[3][6] <= 8'd45;
             pixel_array[3][7] <= 8'd45; pixel_array[3][8] <= 8'd45;
             pixel_array[4][2] <= 8'd45; pixel_array[4][6] <= 8'd45;
-            pixel_array[5][6] <= 8'd45; pixel_array[5][6] <= 8'd45;
+            pixel_array[5][2] <= 8'd45; pixel_array[5][6] <= 8'd45;
             
             //graph
             pixel_array[5][10] <= 8'd16; pixel_array[5][11] <= 8'd27;
@@ -1067,15 +1067,15 @@ module scene_controller(
     //assign array_out = (x_cor > end_x || y_cor > end_y || x_cor < start_x || y_cor < start_y) ? 0 : pixel_array[0][0];
     always @ (posedge CLOCK) begin
        array_out <= (x_cor > end_x || y_cor > end_y || x_cor < start_x || y_cor < start_y) ? 8'd36 : pixel_array[y][x];
-//       text_colour <= (text_state == 0) ? white :
-//        (text_state == 1) ? green : 
-//        (text_state == 2) ? red : 
-//        cyan;
+       text_colour <= (text_state == 0) ? white :
+        (text_state == 1) ? green : 
+        (text_state == 2) ? red : 
+        cyan;
         
-//        back_colour <= (back_state == 0) ? black : 
-//        (back_state == 1) ? blue :
-//        (back_state == 2) ? grey : 
-//        orange;
+        back_colour <= (back_state == 0) ? black : 
+        (back_state == 1) ? blue :
+        (back_state == 2) ? grey : 
+        orange;
     end
     
 endmodule

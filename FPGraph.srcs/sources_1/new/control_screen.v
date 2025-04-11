@@ -35,9 +35,9 @@ module control_screen(
                       int_part_A2, int_part_B2, int_part_C2,
                       int_part_A3, int_part_B3, int_part_C3,
        
-        output        is_neg_A1, is_neg_B1, is_neg_C1,
-                      is_neg_A2, is_neg_B2, is_neg_C2,
-                      is_neg_A3, is_neg_B3, is_neg_C3
+        output        is_negA1, is_negB1, is_negC1,
+                      is_negA2, is_negB2, is_negC2,
+                      is_negA3, is_negB3, is_negC3
 
     );
     
@@ -86,11 +86,11 @@ module control_screen(
        .int_part_A3(int_part_A3), .int_part_B3(int_part_B3), .int_part_C3(int_part_C3),
    
    
-       .is_neg_A1(is_neg_A1), .is_neg_B1(is_neg_B1), .is_neg_C1(is_neg_C1),
-       .is_neg_A2(is_neg_A2), .is_neg_B2(is_neg_B2), .is_neg_C2(is_neg_C2),
-       .is_neg_A3(is_neg_A3), .is_neg_B3(is_neg_B3), .is_neg_C3(is_neg_C3)
+       .is_negA1(is_negA1), .is_negB1(is_negB1), .is_negC1(is_negC1),
+       .is_negA2(is_negA2), .is_negB2(is_negB2), .is_negC2(is_negC2),
+       .is_negA3(is_negA3), .is_negB3(is_negB3), .is_negC3(is_negC3),
        
-       //.text_colour(text_colour),.back_colour(back_colour)
+       .text_colour(text_colour),.back_colour(back_colour)
    );
    
 
