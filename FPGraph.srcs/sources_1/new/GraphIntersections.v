@@ -6,8 +6,15 @@ module GraphIntersections(
 );
 
 reg startCalculate = 0;
+    wire clk5Khz;
 
-always @ (basysClock) begin
+// Instantiate the flexible_clock module with CLK_DIV = 50000 to get 1kHz output:
+flexible_clock #(.CLK_DIV(10000)) clk_gen (
+    .clk_in(basysClock),
+    .clk_out(clk5Khz)
+);
+
+always @ (clk5Khz) begin
     startCalculate <= 1;
 end
 

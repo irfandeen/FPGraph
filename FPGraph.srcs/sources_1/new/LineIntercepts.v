@@ -78,6 +78,10 @@ module LineIntercepts(
     //----------------------------------------------------------
 );
 
+    localparam NOT_CALCULATED = 0, CALCULATED = 1, NO_SOLUTION = 2;
+    localparam ADD = 0, SUB = 1, MUL = 2, DIV = 3;
+    localparam POS = 0, NEG = 1;
+
     // Instantiate IntersectionQuadratic
 
     // Inputs to IntersectionQuadratic for equation coefficients
@@ -113,7 +117,7 @@ module LineIntercepts(
     wire [13:0] temp_Y2Dec;
 
     reg startIntersectionQuadratic = 0;
-    wire       temp_isCalculated;
+    wire [1:0]      temp_isCalculated;
     
     IntersectionQuadratic IntersectionQuadratic_inst (
         .basysClock       (basysClock),
@@ -190,7 +194,7 @@ module LineIntercepts(
                     state <= 1;
                 end
 
-                1: if (temp_isCalculated == 1) begin
+                1: if (temp_isCalculated == CALCULATED || temp_isCalculated == NO_SOLUTION) begin
                     // Store the results for Graph 1 and Graph 2
                     g1g2_X1Sign <= temp_X1Sign;
                     g1g2_X1Int <= temp_X1Int;
@@ -233,7 +237,7 @@ module LineIntercepts(
                     state <= 3;
                 end
 
-                3: if(temp_isCalculated == 1) begin
+                3: if(temp_isCalculated == CALCULATED || temp_isCalculated == NO_SOLUTION) begin
                     // Store the results for Graph 1 and Graph 3
                     g1g3_X1Sign <= temp_X1Sign;
                     g1g3_X1Int <= temp_X1Int;
@@ -276,7 +280,7 @@ module LineIntercepts(
                     state <= 5;
                 end
 
-                5: if(temp_isCalculated == 1) begin
+                5: if(temp_isCalculated == CALCULATED || temp_isCalculated == NO_SOLUTION) begin
                     // Store the results for Graph 2 and Graph 3
                     g2g3_X1Sign <= temp_X1Sign;
                     g2g3_X1Int <= temp_X1Int;

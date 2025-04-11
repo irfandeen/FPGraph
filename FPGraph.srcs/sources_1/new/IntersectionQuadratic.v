@@ -235,7 +235,7 @@ module IntersectionQuadratic(
                 3: begin
                     if (discSign == NEG) begin
                         isCalculated <= NO_SOLUTION;
-                        calculationPhase <= 39;
+                        calculationPhase <= 37;
                     end else begin
                         sqrtStart   <= 0;
                         sqrtInteger <= discInt;
