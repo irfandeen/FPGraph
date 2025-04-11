@@ -4,6 +4,7 @@ module LineIntercepts(
     //----------------------General IO-------------------------
     input                basysClock,
     input                startCalculate,
+    input                mode,
     //---------------------------------------------------------
 
     //-----------------Graph Equation Inputs-------------------
@@ -117,7 +118,7 @@ module LineIntercepts(
     wire [13:0] temp_Y2Dec;
 
     reg startIntersectionQuadratic = 0;
-    wire [1:0]      temp_isCalculated;
+    wire [1:0] temp_isCalculated;
     
     IntersectionQuadratic IntersectionQuadratic_inst (
         .basysClock       (basysClock),
@@ -149,21 +150,17 @@ module LineIntercepts(
         .isCalculated     (temp_isCalculated)
     );
 
-
     wire clk100Khz;
-
-    // Instantiate the flexible_clock module with CLK_DIV = 50000 to get 1kHz output:
     flexible_clock #(.CLK_DIV(500)) clk_gen (
         .clk_in(basysClock),
         .clk_out(clk100Khz)
     );
 
-    // Correct state declaration (example uses 3 bits)
+    // State machine for selecting the proper intersection calculation results.
     reg [2:0] state = 6;
     reg prevStartCalculate = 0;
 
-
-    always @ (posedge clk100Khz) begin
+    always @(posedge clk100Khz) begin
         prevStartCalculate <= startCalculate;
 
         if (startCalculate && !prevStartCalculate) begin
@@ -175,7 +172,6 @@ module LineIntercepts(
         end else begin
             case (state)
                 0: begin
-                    // Set up the first intersection calculation
                     temp_a1Sign <= a1Sign;
                     temp_a1Integer <= a1Integer;
                     temp_b1Sign <= b1Sign;
@@ -183,19 +179,28 @@ module LineIntercepts(
                     temp_c1Sign <= c1Sign;
                     temp_c1Integer <= c1Integer;
 
-                    temp_a2Sign <= a2Sign;
-                    temp_a2Integer <= a2Integer;
-                    temp_b2Sign <= b2Sign;
-                    temp_b2Integer <= b2Integer;
-                    temp_c2Sign <= c2Sign;
-                    temp_c2Integer <= c2Integer;
+                    if (mode == 0) begin
+                        temp_a2Sign <= a2Sign;
+                        temp_a2Integer <= a2Integer;
+                        temp_b2Sign <= b2Sign;
+                        temp_b2Integer <= b2Integer;
+                        temp_c2Sign <= c2Sign;
+                        temp_c2Integer <= c2Integer;
+                    end else begin
+                        temp_a2Sign <= 0;
+                        temp_a2Integer <= 0;
+                        temp_b2Sign <= 0;
+                        temp_b2Integer <= 0;
+                        temp_c2Sign <= 0;
+                        temp_c2Integer <= 0;
+                    end
 
-                    startIntersectionQuadratic <= 1; // Start the intersection calculation
+                    startIntersectionQuadratic <= 1; // start the calculation
                     state <= 1;
                 end
 
                 1: if (temp_isCalculated == CALCULATED || temp_isCalculated == NO_SOLUTION) begin
-                    // Store the results for Graph 1 and Graph 2
+                    // Store results for Graph 1 & 2
                     g1g2_X1Sign <= temp_X1Sign;
                     g1g2_X1Int <= temp_X1Int;
                     g1g2_X1Dec <= temp_X1Dec;
@@ -212,33 +217,49 @@ module LineIntercepts(
                     g1g2_Y2Int <= temp_Y2Int;
                     g1g2_Y2Dec <= temp_Y2Dec;
 
-                    g1g2_isCalculated <= temp_isCalculated; // Indicate that the calculation is done
-                    startIntersectionQuadratic <= 0; 
+                    g1g2_isCalculated <= temp_isCalculated;
+                    startIntersectionQuadratic <= 0;
                     state <= 2;
                 end
 
                 2: begin
-                    // Set up the second intersection calculation
-                    temp_a1Sign <= a1Sign;
-                    temp_a1Integer <= a1Integer;
-                    temp_b1Sign <= b1Sign;
-                    temp_b1Integer <= b1Integer;
-                    temp_c1Sign <= c1Sign;
-                    temp_c1Integer <= c1Integer;
+                    // Set up second intersection calculation
+                    if (mode == 0) begin
+                        temp_a1Sign <= a1Sign;
+                        temp_a1Integer <= a1Integer;
+                        temp_b1Sign <= b1Sign;
+                        temp_b1Integer <= b1Integer;
+                        temp_c1Sign <= c1Sign;
+                        temp_c1Integer <= c1Integer;
 
-                    temp_a2Sign <= a3Sign;
-                    temp_a2Integer <= a3Integer;
-                    temp_b2Sign <= b3Sign;
-                    temp_b2Integer <= b3Integer;
-                    temp_c2Sign <= c3Sign;
-                    temp_c2Integer <= c3Integer;
+                        temp_a2Sign <= a3Sign;
+                        temp_a2Integer <= a3Integer;
+                        temp_b2Sign <= b3Sign;
+                        temp_b2Integer <= b3Integer;
+                        temp_c2Sign <= c3Sign;
+                        temp_c2Integer <= c3Integer;
+                    end else begin
+                        temp_a1Sign <= a2Sign;
+                        temp_a1Integer <= a2Integer;
+                        temp_b1Sign <= b2Sign;
+                        temp_b1Integer <= b2Integer;
+                        temp_c1Sign <= c2Sign;
+                        temp_c1Integer <= c2Integer;
 
-                    startIntersectionQuadratic <= 1; // Start the intersection calculation
+                        temp_a2Sign <= 0;
+                        temp_a2Integer <= 0;
+                        temp_b2Sign <= 0;
+                        temp_b2Integer <= 0;
+                        temp_c2Sign <= 0;
+                        temp_c2Integer <= 0;
+                    end
+
+                    startIntersectionQuadratic <= 1;
                     state <= 3;
                 end
 
-                3: if(temp_isCalculated == CALCULATED || temp_isCalculated == NO_SOLUTION) begin
-                    // Store the results for Graph 1 and Graph 3
+                3: if (temp_isCalculated == CALCULATED || temp_isCalculated == NO_SOLUTION) begin
+                    // Store results for Graph 1 & 3
                     g1g3_X1Sign <= temp_X1Sign;
                     g1g3_X1Int <= temp_X1Int;
                     g1g3_X1Dec <= temp_X1Dec;
@@ -255,33 +276,49 @@ module LineIntercepts(
                     g1g3_Y2Int <= temp_Y2Int;
                     g1g3_Y2Dec <= temp_Y2Dec;
 
-                    g1g3_isCalculated <= temp_isCalculated; // Indicate that the calculation is done
-                    startIntersectionQuadratic <= 0; 
+                    g1g3_isCalculated <= temp_isCalculated;
+                    startIntersectionQuadratic <= 0;
                     state <= 4;
                 end
 
                 4: begin
-                    // Set up the third intersection calculation
-                    temp_a1Sign <= a2Sign;
-                    temp_a1Integer <= a2Integer;
-                    temp_b1Sign <= b2Sign;
-                    temp_b1Integer <= b2Integer;
-                    temp_c1Sign <= c2Sign;
-                    temp_c1Integer <= c2Integer;
+                    // Set up third intersection calculation
+                    if (mode == 0) begin
+                        temp_a1Sign <= a2Sign;
+                        temp_a1Integer <= a2Integer;
+                        temp_b1Sign <= b2Sign;
+                        temp_b1Integer <= b2Integer;
+                        temp_c1Sign <= c2Sign;
+                        temp_c1Integer <= c2Integer;
 
-                    temp_a2Sign <= a3Sign;
-                    temp_a2Integer <= a3Integer;
-                    temp_b2Sign <= b3Sign;
-                    temp_b2Integer <= b3Integer;
-                    temp_c2Sign <= c3Sign;
-                    temp_c2Integer <= c3Integer;
+                        temp_a2Sign <= a3Sign;
+                        temp_a2Integer <= a3Integer;
+                        temp_b2Sign <= b3Sign;
+                        temp_b2Integer <= b3Integer;
+                        temp_c2Sign <= c3Sign;
+                        temp_c2Integer <= c3Integer;
+                    end else begin
+                        temp_a1Sign <= a3Sign;
+                        temp_a1Integer <= a3Integer;
+                        temp_b1Sign <= b3Sign;
+                        temp_b1Integer <= b3Integer;
+                        temp_c1Sign <= c3Sign;
+                        temp_c1Integer <= c3Integer;
 
-                    startIntersectionQuadratic <= 1; // Start the intersection calculation
+                        temp_a2Sign <= 0;
+                        temp_a2Integer <= 0;
+                        temp_b2Sign <= 0;
+                        temp_b2Integer <= 0;
+                        temp_c2Sign <= 0;
+                        temp_c2Integer <= 0;
+                    end
+
+                    startIntersectionQuadratic <= 1;
                     state <= 5;
                 end
 
-                5: if(temp_isCalculated == CALCULATED || temp_isCalculated == NO_SOLUTION) begin
-                    // Store the results for Graph 2 and Graph 3
+                5: if (temp_isCalculated == CALCULATED || temp_isCalculated == NO_SOLUTION) begin
+                    // Store results for Graph 2 & 3
                     g2g3_X1Sign <= temp_X1Sign;
                     g2g3_X1Int <= temp_X1Int;
                     g2g3_X1Dec <= temp_X1Dec;
@@ -298,13 +335,13 @@ module LineIntercepts(
                     g2g3_Y2Int <= temp_Y2Int;
                     g2g3_Y2Dec <= temp_Y2Dec;
 
-                    g2g3_isCalculated <= temp_isCalculated; // Indicate that the calculation is done
-                    startIntersectionQuadratic <= 0; 
+                    g2g3_isCalculated <= temp_isCalculated;
+                    startIntersectionQuadratic <= 0;
                     state <= 6;
                 end
 
                 6: begin
-                    // Do nothing, final state
+                    // Final state: do nothing.
                     state <= 6;
                 end
 
@@ -314,4 +351,6 @@ module LineIntercepts(
     end
 
 endmodule
+
+
 
