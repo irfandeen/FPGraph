@@ -56,10 +56,10 @@ module scene_controller(
     
         
     //debouncing
-    // Debounce counter and period (200ms)
+    // Debounce counter and period 
     reg [23:0] debounceCounter = 0;
     //reg prevPushState = 0;
-    localparam DEBOUNCE_PERIOD = 24'd4000000; // 80ms at 25MHz
+    localparam DEBOUNCE_PERIOD = 24'd4000000; // 160ms at 25MHz
     reg btnc_press, btnr_press;
     reg btnl_press, btnu_press;
     reg btnd_press;
@@ -699,10 +699,10 @@ module scene_controller(
               end
               
               colour:begin
-              if (dot_y == 4) begin
+              if (dot_y == 6) begin
               text_state <= (text_state == 2'd3) ? 0 : text_state + 1;
               end
-              else if (dot_y == 6) begin
+              else if (dot_y == 4) begin
               back_state <= (back_state == 2'd3) ? 0 : back_state + 1;
               end
               else if (dot_y == 8) begin
@@ -1010,16 +1010,16 @@ module scene_controller(
             //dot
             pixel_array[dot_y][dot_x] <= 8'd37;
             //colour text
-            pixel_array[3][10] <= (text_state == 0) ? 8'd32 : 
+            pixel_array[6][10] <= (text_state == 0) ? 8'd32 : 
             (text_state == 1) ? 8'd16 : 
             (text_state == 2) ? 8'd27 : 8'd12;
             
             //colour back
-            pixel_array[6][10] <= (text_state == 0) ? 8'd11 : 
-            (text_state == 1) ? 8'd11 : 
-            (text_state == 2) ? 8'd16 : 8'd24;
-            pixel_array[6][11] <= (text_state == 0) ? 8'd21 : 8'd36;
-            pixel_array[6][12] <= (text_state == 0) ? 8'd20 : 8'd30;
+            pixel_array[3][10] <= (back_state == 0) ? 8'd11 : 
+            (back_state == 1) ? 8'd11 : 
+            (back_state == 2) ? 8'd16 : 8'd24;
+            pixel_array[3][11] <= (back_state == 0 || back_state == 1) ? 8'd21 : 8'd36;
+            pixel_array[3][12] <= (back_state == 0) ? 8'd20 :(back_state == 1) ? 8'd30 : 8'd36;
             
             //colour select
             pixel_array[1][3] <= 8'd12; pixel_array[1][4] <= 8'd24;

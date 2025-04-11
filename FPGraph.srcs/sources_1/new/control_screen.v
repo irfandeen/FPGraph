@@ -65,8 +65,8 @@ module control_screen(
    assign x = (x_cor - start_x) % 5;
    assign y = (y_cor - start_y) % 5;
    
-   wire text_colour;
-   wire back_colour;
+   wire [15:0] text_colour;
+   wire [15:0] back_colour;
    
    //scene_controller control_scene (.btnc(btnc), .btnr(btnr), .btnl(btnl), .btnu(btnu), .btnd(btnd), .x_cor(x_cor), .CLOCK(CLOCK), .y_cor(y_cor), .array_out(screen_chars));
   // Instantiate the scene_controller module
@@ -104,15 +104,15 @@ reg [7:0] y_pos;
    
    always @(posedge CLOCK) begin
       if (x_cor > end_x || y_cor > end_y || x_cor < start_x || y_cor < start_y) begin
-      colour_out <= 16'h0000;
+      colour_out <= back_colour;
       end else begin
       x_pos = (x_cor - start_x) / 5;
       y_pos = (y_cor - start_y) / 5;
       
       if (pixel_out) begin
-      colour_out <= 16'hFFFF;
+      colour_out <= text_colour;
       end else begin
-      colour_out <= 16'h0000;
+      colour_out <= back_colour;
       end
       
       
