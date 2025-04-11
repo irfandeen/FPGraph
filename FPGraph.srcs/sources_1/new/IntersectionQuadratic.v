@@ -11,9 +11,10 @@ module IntersectionQuadratic(
                       y1Integer, y1Decimal,
                       x2Integer, x2Decimal,
                       y2Integer, y2Decimal,
-    output reg [1:0] isCalculated,  // 0: NOT_CALCULATED, 1: CALCULATED, 2: NO_SOLUTION
+    output reg [1:0] isCalculated  // 0: NOT_CALCULATED, 1: CALCULATED, 2: NO_SOLUTION
 
     
+    /*
     // DEBUG ONLY
     output reg [5:0] calculationPhaseDebug,
     output reg       isCalculatedRootDebug,
@@ -25,6 +26,7 @@ module IntersectionQuadratic(
     output reg [13:0] twoAIntDebug, minusBIntDebug,
     output reg twoASignDebug, minusBSignDebug
     // DEBUG ONLY
+    */
     
 );
 
@@ -183,6 +185,7 @@ module IntersectionQuadratic(
     /* Main Sequential Calculation */
     always @(posedge clk1Mhz) begin
         
+        /*
         // DEBUG signals
         calculationPhaseDebug <= calculationPhase;
         isCalculatedRootDebug <= isCalculatedRoot;
@@ -197,6 +200,7 @@ module IntersectionQuadratic(
         twoASignDebug <= twoASign;
         minusBIntDebug <= minusBInt;
         minusBSignDebug <= minusBSign;
+        */
         
         
         prevStartCalculate <= startCalculate;
