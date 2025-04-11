@@ -11,9 +11,9 @@ module IntersectionQuadratic(
                       y1Integer, y1Decimal,
                       x2Integer, x2Decimal,
                       y2Integer, y2Decimal,
-    output reg [1:0] isCalculated  // 0: NOT_CALCULATED, 1: CALCULATED, 2: NO_SOLUTION
+    output reg [1:0] isCalculated,  // 0: NOT_CALCULATED, 1: CALCULATED, 2: NO_SOLUTION
 
-    /*
+    
     // DEBUG ONLY
     output reg [5:0] calculationPhaseDebug,
     output reg       isCalculatedRootDebug,
@@ -25,7 +25,7 @@ module IntersectionQuadratic(
     output reg [13:0] twoAIntDebug, minusBIntDebug,
     output reg twoASignDebug, minusBSignDebug
     // DEBUG ONLY
-    */
+    
 );
 
     localparam NOT_CALCULATED = 0, CALCULATED = 1, NO_SOLUTION = 2;
@@ -166,14 +166,23 @@ module IntersectionQuadratic(
     reg        secondAnsYSign;
     reg [13:0] secondAnsYInt;
     reg [13:0] secondAnsYDec;
+
+    //1Mhz Clock
+    wire clk1Mhz;
+
+    // Instantiate the flexible_clock module with CLK_DIV = 50000 to get 1kHz output:
+    flexible_clock #(.CLK_DIV(50)) clk_gen (
+        .clk_in(basysClock),
+        .clk_out(clk1Mhz)
+    );
     
     // Control: Calculation Phase
     reg [5:0] calculationPhase = 39;
     reg prevStartCalculate = 0;
     
     /* Main Sequential Calculation */
-    always @(posedge basysClock) begin
-        /*
+    always @(posedge clk1Mhz) begin
+        
         // DEBUG signals
         calculationPhaseDebug <= calculationPhase;
         isCalculatedRootDebug <= isCalculatedRoot;
@@ -188,7 +197,7 @@ module IntersectionQuadratic(
         twoASignDebug <= twoASign;
         minusBIntDebug <= minusBInt;
         minusBSignDebug <= minusBSign;
-        */
+        
         
         prevStartCalculate <= startCalculate;
         if (startCalculate && !prevStartCalculate) begin

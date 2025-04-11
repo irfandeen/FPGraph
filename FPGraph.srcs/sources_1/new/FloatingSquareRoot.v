@@ -13,13 +13,14 @@ module FloatingSquareRoot(
 
     /*
     //DEBUG ONLY
-    //output  [23:0] finalResultIntegerDebug,
-    //output  [23:0] finalResultDecimalDebug,
-    //output  isFloatingCalculatedDebug,
-    //output reg [3:0] stateDebug,
-    //output reg [3:0] innerStateDebug
+    output  [13:0] finalResultIntegerDebug,
+    output  [13:0] finalResultDecimalDebug,
+    output  isFloatingCalculatedDebug,
+    output reg [3:0] stateDebug,
+    output reg [3:0] innerStateDebug
     //DEBUG ONLY
     */
+    
 );
 
     localparam ADD         = 0;
@@ -44,11 +45,13 @@ module FloatingSquareRoot(
     wire [13:0] finalResultDecimal;
     wire        isFloatingCalculated;
     
+    /*
     //DEBUG ONLY
-    //assign isFloatingCalulcatedDebug = isFloatingCalculated;
-    //assign finalResultIntegerDebug = finalResultInteger;
-    //assign finalResultDecimalDebug = finalResultDecimal;
+    assign isFloatingCalulcatedDebug = isFloatingCalculated;
+    assign finalResultIntegerDebug = finalResultInteger;
+    assign finalResultDecimalDebug = finalResultDecimal;
     //DEBUG ONLY
+    */
 
     FloatingPoint calculator (
         .firstValueSign(firstValueSign),
@@ -76,11 +79,23 @@ module FloatingSquareRoot(
     reg [13:0] xPlusXDividedByGuessInteger;
     reg [13:0] xPlusXDividedByGuessDecimal;
 
-    always @(posedge basysClock) begin
+    //10Mhz Clock
+    wire clk10Mhz;
+
+    // Instantiate the flexible_clock module with CLK_DIV = 50000 to get 1kHz output:
+    flexible_clock #(.CLK_DIV(5)) clk_gen (
+        .clk_in(basysClock),
+        .clk_out(clk10Mhz)
+    );
+
+    always @(posedge clk10Mhz) begin
+
+        /*
         //DEBUG ONLY
-        //stateDebug <= state;
-        //innerStateDebug <= innerState;
+        stateDebug <= state;
+        innerStateDebug <= innerState;
         //DEBUG ONLY
+        */
 
         prevStartCalculate <= startCalculate;
         if (prevStartCalculate == 0 && startCalculate == 1) begin

@@ -146,12 +146,12 @@ module LineIntercepts(
     );
 
 
-    wire clk1khz;
+    wire clk100Khz;
 
     // Instantiate the flexible_clock module with CLK_DIV = 50000 to get 1kHz output:
-    flexible_clock #(.CLK_DIV(50000)) clk_gen (
+    flexible_clock #(.CLK_DIV(500)) clk_gen (
         .clk_in(basysClock),
-        .clk_out(clk1Khz)
+        .clk_out(clk100Khz)
     );
 
     // Correct state declaration (example uses 3 bits)
@@ -159,7 +159,7 @@ module LineIntercepts(
     reg prevStartCalculate = 0;
 
 
-    always @ (posedge clk1Khz) begin
+    always @ (posedge clk100Khz) begin
         prevStartCalculate <= startCalculate;
 
         if (startCalculate && !prevStartCalculate) begin
