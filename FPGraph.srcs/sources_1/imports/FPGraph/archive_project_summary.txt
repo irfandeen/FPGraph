@@ -1,0 +1,207 @@
+***************************************************************************************
+*                      PROJECT ARCHIVE SUMMARY REPORT
+*
+*                      (archive_project_summary.txt)
+*
+*  PLEASE READ THIS REPORT TO GET THE DETAILED INFORMATION ABOUT THE PROJECT DATA THAT
+*  WAS ARCHIVED FOR THE CURRENT PROJECT
+*
+* The report is divided into following five sections:-
+*
+* Section (1) - PROJECT INFORMATION
+*  This section provides the details of the current project that was archived
+*
+* Section (2) - INCLUDED/EXCLUDED RUNS
+*  This section summarizes the list of design runs for which the results were included
+*  or excluded from the archive
+*
+* Section (3) - ARCHIVED SOURCES
+*  This section summarizes the list of files that were added to the archive
+*
+* Section (3.1) - INCLUDE FILES
+*  This section summarizes the list of 'include' files that were added to the archive
+*
+* Section (3.1.1) - INCLUDE_DIRS SETTINGS
+*  This section summarizes the 'verilog include directory' path settings, if any
+*
+* Section (3.2) - REMOTE SOURCES
+*  This section summarizes the list of referenced 'remote' files that were 'imported'
+*  into the archived project
+*
+* Section (3.3) - SOURCES SUMMARY
+*  This section summarizes the list of all the files present in the archive
+*
+* Section (3.4) - REMOTE IP DEFINITIONS
+*  This section summarizes the list of all the remote IP's present in the archive
+*
+* Section (4) - JOURNAL/LOG FILES
+*  This section summarizes the list of journal/log files that were added to the archive
+*
+* Section (5) - CONFIGURATION SETTINGS/FILES
+*  This section summarizes the configuration settings/files that were added to the archive
+*
+***************************************************************************************
+
+Section (1) - PROJECT INFORMATION
+---------------------------------
+Name      = FPGraph
+Directory = C:/Users/zexue/OneDrive/Desktop/EE2026/Project
+
+WARNING: Please verify the compiled library directory path for the following property in the
+         current project. The path may point to an invalid location after opening this project.
+         This could happen if the project was unarchived in a location where this path is not
+         accessible. To resolve this issue, please set this property with the desired path
+         before launching simulation:-
+
+Property = compxlib.xsim_compiled_library_dir
+Path     = 
+
+Section (2) - Excluded Runs
+---------------------------
+The run results were excluded for the following runs in the archived project:-
+
+<synth_1>
+<coord_mem_synth_1>
+<impl_1>
+<coord_mem_impl_1>
+
+Section (3) - ARCHIVED SOURCES
+------------------------------
+The following sub-sections describes the list of sources that were archived for the current project:-
+
+Section (3.1) - INCLUDE FILES
+-----------------------------
+List of referenced 'RTL Include' files that were 'imported' into the archived project:-
+
+None
+
+Section (3.1.1) - INCLUDE_DIRS SETTINGS
+---------------------------------------
+List of the "INCLUDE_DIRS" fileset property settings that may or may not be applicable in the archived
+project, since most the 'RTL Include' files referenced in the original project were 'imported' into the
+archived project.
+
+<sources_1> fileset RTL include directory paths (INCLUDE_DIRS):-
+None
+
+<sim_1> fileset RTL include directory paths (INCLUDE_DIRS):-
+None
+
+Section (3.2) - REMOTE SOURCES
+------------------------------
+List of referenced 'remote' design files that were 'imported' into the archived project:-
+
+<coord_mem>
+None
+
+<constrs_1>
+C:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/constrs_1/imports/Downloads/Basys3_Master.xdc
+
+<sim_1>
+None
+
+<sources_1>
+C:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0.xci
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/doc/clk_wiz_v6_0_changelog.txt
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0_board.xdc
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0.veo
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/mmcm_pll_drp_func_7s_mmcm.vh
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/mmcm_pll_drp_func_7s_pll.vh
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/mmcm_pll_drp_func_us_mmcm.vh
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/mmcm_pll_drp_func_us_pll.vh
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/mmcm_pll_drp_func_us_plus_pll.vh
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/mmcm_pll_drp_func_us_plus_mmcm.vh
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0_clk_wiz.v
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0.v
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0.dcp
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0_stub.v
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0_stub.vhdl
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0_sim_netlist.v
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0_sim_netlist.vhdl
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0.xdc
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0_ooc.xdc
+c:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0.xml
+C:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/new/EquationDisplay.v
+C:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/new/GraphLogic.v
+C:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/new/SideBar.v
+C:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/new/VGAControl.v
+C:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/new/cursor_state.v
+C:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/new/pan_state.v
+C:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/new/scroll_state.v
+C:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/new/vga_driver.v
+C:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/imports/Mouse_Control.vhd
+C:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/imports/Ps2Interface.vhd
+C:/Users/zexue/OneDrive/Desktop/EE2026/Project/FPGraph/FPGraph.srcs/sources_1/new/FPGraph.v
+
+Section (3.3) - SOURCES SUMMARY
+-------------------------------
+List of all the source files present in the archived project:-
+
+<sources_1>
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/doc/clk_wiz_v6_0_changelog.txt
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0_board.xdc
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.veo
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/mmcm_pll_drp_func_7s_mmcm.vh
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/mmcm_pll_drp_func_7s_pll.vh
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/mmcm_pll_drp_func_us_mmcm.vh
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/mmcm_pll_drp_func_us_pll.vh
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/mmcm_pll_drp_func_us_plus_pll.vh
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/mmcm_pll_drp_func_us_plus_mmcm.vh
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0_clk_wiz.v
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.v
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.dcp
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0_stub.v
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0_stub.vhdl
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0_sim_netlist.v
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0_sim_netlist.vhdl
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xdc
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0_ooc.xdc
+./FPGraph.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xml
+./FPGraph.srcs/sources_1/imports/sources_1/new/EquationDisplay.v
+./FPGraph.srcs/sources_1/imports/sources_1/new/GraphLogic.v
+./FPGraph.srcs/sources_1/imports/sources_1/new/SideBar.v
+./FPGraph.srcs/sources_1/imports/sources_1/new/VGAControl.v
+./FPGraph.srcs/sources_1/imports/sources_1/new/cursor_state.v
+./FPGraph.srcs/sources_1/imports/sources_1/new/pan_state.v
+./FPGraph.srcs/sources_1/imports/sources_1/new/scroll_state.v
+./FPGraph.srcs/sources_1/new/vga_char_rom.v
+./FPGraph.srcs/sources_1/imports/sources_1/new/vga_driver.v
+./FPGraph.srcs/sources_1/imports/sources_1/imports/Mouse_Control.vhd
+./FPGraph.srcs/sources_1/imports/sources_1/imports/Ps2Interface.vhd
+./FPGraph.srcs/sources_1/imports/sources_1/new/FPGraph.v
+
+<constrs_1>
+./FPGraph.srcs/constrs_1/imports/Downloads/Basys3_Master.xdc
+
+<sim_1>
+None
+
+<coord_mem>
+None
+
+Section (3.4) - REMOTE IP DEFINITIONS
+-------------------------------------
+List of all the remote IP's present in the archived project:-
+
+<sources_1>
+None
+
+<coord_mem>
+None
+
+Section (4) - JOURNAL/LOG FILES
+-------------------------------
+List of Journal/Log files that were added to the archived project:-
+
+Source File = C:/Users/zexue/AppData/Roaming/Xilinx/Vivado/vivado.jou
+Archived Location = ./FPGraph/vivado.jou
+
+Source File = C:/Users/zexue/AppData/Roaming/Xilinx/Vivado/vivado.log
+Archived Location = ./FPGraph/vivado.log
+
+Section (5) - CONFIGURATION SETTINGS/FILES
+------------------------------------------
+List of configuration settings/files that were added to the archived project:-
+
+

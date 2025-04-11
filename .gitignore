@@ -1,0 +1,8 @@
+# Everything
+*
+
+# Except
+!.gitignore
+!FPGraph.srcs/
+!FPGraph.srcs/**
+!README.md
