@@ -21,8 +21,8 @@
 
 
 module FloatingPointRound(
-    input wire [14:0] int,  // Integer part (e.g., 12)
-    input wire [14:0] dec,  // Decimal part (e.g., 345 for .345)
+    input wire [13:0] int,  // Integer part (e.g., 12)
+    input wire [13:0] dec,  // Decimal part (e.g., 345 for .345)
 
     output wire [3:0] int_hundreds,
     output wire [3:0] int_tens,
@@ -33,10 +33,10 @@ module FloatingPointRound(
 );
 
     // Add 5 for rounding the third decimal digit (e.g., 12.345 ? 12.35)
-    wire [15:0] dec_rounded = dec + 5;
-
-    // Truncate to 2 decimal digits (remove the thousandths place)
-    wire [15:0] dec_two_digits = dec_rounded / 10;
+    wire [15:0] dec_rounded = dec + 50;
+    
+    // Truncate to 2 decimal digits by dropping 2 least significant digits
+    wire [15:0] dec_two_digits = dec_rounded / 100;
 
     // Handle overflow into the integer part (e.g., 12.995 ? 13.00)
     wire [15:0] new_int = (dec_two_digits >= 100) ? (int + 1) : int;
@@ -48,7 +48,7 @@ module FloatingPointRound(
     assign int_ones     = new_int % 10;
 
     // Decimal digits
-    assign dec_tenths     = (new_dec / 10) % 10;
+    assign dec_tenths     = new_dec / 10;
     assign dec_hundredths = new_dec % 10;
 
 endmodule

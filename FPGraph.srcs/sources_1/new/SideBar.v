@@ -155,7 +155,7 @@ module SideBar #(
         .base_y(BASE_Y1 + CHAR_HEIGHT + 2),
         .en(1),
         .x_sign(0), .y_sign(1),
-        .x_int(000), .x_dec(000), .y_int(0012), .y_dec(949),    
+        .x_int(1234), .x_dec(5678), .y_int(0012), .y_dec(90),    
         .r(r5), .g(g5), .b(b5)
     );
     InterceptDisplay i2 (
