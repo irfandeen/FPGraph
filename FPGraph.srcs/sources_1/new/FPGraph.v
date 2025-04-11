@@ -5,6 +5,11 @@
 
 module FPGraph(
     input wire clk,
+    input btnC,
+    input btnU,
+    input btnD,
+    input btnL,
+    input btnR,
     output reg [3:0]   vgaRed,
     output reg [3:0] vgaGreen,
     output reg [3:0]  vgaBlue,
@@ -13,6 +18,7 @@ module FPGraph(
     output reg sanity_led,
     output wire [3:0] an,
     output wire [7:0] seg,
+    output [7:0] JB,
     
     // Mouse IO
     inout PS2Clk,
@@ -79,6 +85,142 @@ module FPGraph(
         .g(graph_green),
         .b(graph_blue)
     );
+    
+    
+    
+        wire main_reset;
+    wire clock_25Mhz;
+    wire clock_6_25Mhz;
+    wire [12:0] pixel_index;
+    wire [7:0] x_cor = pixel_index % 96;
+    wire [7:0] y_cor = pixel_index / 96;
+    
+    // Generate 25 MHz clock for control_screen
+    flexible_clock #( .CLK_DIV(3) ) clk_gen_25Mhz (
+        .clk_in(clk),
+        .clk_out(clock_25Mhz)
+    );
+    
+    // Generate 6.25 MHz clock for oled_driver
+    flexible_clock #( .CLK_DIV(7) ) clk_gen_6_25Mhz (
+            .clk_in(clk),
+            .clk_out(clock_6_25Mhz)
+     );
+    
+    // Declare wires for the outputs
+    wire [15:0] colour_out;
+    wire [6:0] int_part_A1, int_part_B1, int_part_C1;
+    wire [6:0] int_part_A2, int_part_B2, int_part_C2;
+    wire [6:0] int_part_A3, int_part_B3, int_part_C3;
+    
+    wire is_neg_A1, is_neg_B1, is_neg_C1;
+    wire is_neg_A2, is_neg_B2, is_neg_C2;
+    wire is_neg_A3, is_neg_B3, is_neg_C3;
+    
+    // Instantiate control_screen
+    control_screen u_control_screen (
+        .CLOCK(clock_25Mhz),
+        .x_cor(x_cor),
+        .y_cor(y_cor),
+        .pixel_index(pixel_index),
+        .btnc(btnC),
+        .btnr(btnR),
+        .btnl(btnL),
+        .btnu(btnU),
+        .btnd(btnD),
+        .colour_out(colour_out),
+        .int_part_A1(int_part_A1), .int_part_B1(int_part_B1), .int_part_C1(int_part_C1),
+        .int_part_A2(int_part_A2), .int_part_B2(int_part_B2), .int_part_C2(int_part_C2),
+        .int_part_A3(int_part_A3), .int_part_B3(int_part_B3), .int_part_C3(int_part_C3),
+        .is_negA1(is_neg_A1), .is_negB1(is_neg_B1), .is_negC1(is_neg_C1),
+        .is_negA2(is_neg_A2), .is_negB2(is_neg_B2), .is_negC2(is_neg_C2),
+        .is_negA3(is_neg_A3), .is_negB3(is_neg_B3), .is_negC3(is_neg_C3)
+    );
+    
+    Oled_Display oled_driver(
+                    .clk(clock_6_25Mhz), 
+                    .reset(main_reset), 
+                    .frame_begin(), 
+                    .sending_pixels(),
+                    .sample_pixel(), 
+                    .pixel_index(pixel_index), 
+                    .pixel_data(colour_out), 
+                    .cs(JB[0]), 
+                    .sdin(JB[1]), 
+                    .sclk(JB[3]), 
+                    .d_cn(JB[4]), 
+                    .resn(JB[5]), 
+                    .vccen(JB[6]),
+                    .pmoden(JB[7])
+           );
+           
+    
+//    // Wires/regs to connect (you'll need real values or signals for these)
+          
+          
+           
+           wire [13:0] r0_c0_int, r0_c0_dec, r0_c1_int, r0_c1_dec;
+           wire [13:0] r1_c0_int, r1_c0_dec, r1_c1_int, r1_c1_dec;
+           wire [13:0] r2_c0_int, r2_c0_dec, r2_c1_int, r2_c1_dec;
+           wire [13:0] r3_c0_int, r3_c0_dec, r3_c1_int, r3_c1_dec;
+           wire [13:0] r4_c0_int, r4_c0_dec, r4_c1_int, r4_c1_dec;
+           wire [13:0] r5_c0_int, r5_c0_dec, r5_c1_int, r5_c1_dec;
+           
+           wire r0_c0_s, r0_c1_s;
+           wire r1_c0_s, r1_c1_s;
+           wire r2_c0_s, r2_c1_s;
+           wire r3_c0_s, r3_c1_s;
+           wire r4_c0_s, r4_c1_s;
+           wire r5_c0_s, r5_c1_s;
+           
+           wire en_r0, en_r1, en_r2, en_r3, en_r4, en_r5;
+           wire [1:0] intercept_state;
+           
+           wire [3:0] sidebar_red, sidebar_green, sidebar_blue;
+           
+           SideBar #(
+               .BASE_X(430),
+               .BASE_Y0(40),
+               .BASE_Y1(240),
+               .CHAR_WIDTH(8),
+               .CHAR_HEIGHT(16)
+           ) sidebar_inst (
+               .clk(clk),
+               .x(x),
+               .y(y),
+           
+               .a1_1(int_part_A1 / 10), .a0_1(int_part_A1 % 10), .b1_1(int_part_B1 / 10), .b0_1(int_part_B1 % 10), .c1_1(int_part_C1 / 10), .c0_1(int_part_C1 % 10),
+               .a1_2(int_part_A2 / 10), .a0_2(int_part_A2 % 10), .b1_2(int_part_B2 / 10), .b0_2(int_part_B2 % 10), .c1_2(int_part_C2 / 10), .c0_2(int_part_C2 % 10),
+               .a1_3(int_part_A3 / 10), .a0_3(int_part_A3 % 10), .b1_3(int_part_B3 / 10), .b0_3(int_part_B3 % 10), .c1_3(int_part_C3 / 10), .c0_3(int_part_C3 % 10),
+           
+               .sa_1(is_neg_A1), .sb_1(is_neg_B1), .sc_1(is_neg_C1),
+               .sa_2(is_neg_A2), .sb_2(is_neg_B2), .sc_2(is_neg_C1),
+               .sa_3(is_neg_A3), .sb_3(is_neg_B3), .sc_3(is_neg_C1),
+           
+               .r0_c0_int(r0_c0_int), .r0_c0_dec(r0_c0_dec), .r0_c1_int(r0_c1_int), .r0_c1_dec(r0_c1_dec),
+               .r1_c0_int(r1_c0_int), .r1_c0_dec(r1_c0_dec), .r1_c1_int(r1_c1_int), .r1_c1_dec(r1_c1_dec),
+               .r2_c0_int(r2_c0_int), .r2_c0_dec(r2_c0_dec), .r2_c1_int(r2_c1_int), .r2_c1_dec(r2_c1_dec),
+               .r3_c0_int(r3_c0_int), .r3_c0_dec(r3_c0_dec), .r3_c1_int(r3_c1_int), .r3_c1_dec(r3_c1_dec),
+               .r4_c0_int(r4_c0_int), .r4_c0_dec(r4_c0_dec), .r4_c1_int(r4_c1_int), .r4_c1_dec(r4_c1_dec),
+               .r5_c0_int(r5_c0_int), .r5_c0_dec(r5_c0_dec), .r5_c1_int(r5_c1_int), .r5_c1_dec(r5_c1_dec),
+           
+               .r0_c0_s(r0_c0_s), .r0_c1_s(r0_c1_s),
+               .r1_c0_s(r1_c0_s), .r1_c1_s(r1_c1_s),
+               .r2_c0_s(r2_c0_s), .r2_c1_s(r2_c1_s),
+               .r3_c0_s(r3_c0_s), .r3_c1_s(r3_c1_s),
+               .r4_c0_s(r4_c0_s), .r4_c1_s(r4_c1_s),
+               .r5_c0_s(r5_c0_s), .r5_c1_s(r5_c1_s),
+           
+               .en_r0(en_r0), .en_r1(en_r1), .en_r2(en_r2),
+               .en_r3(en_r3), .en_r4(en_r4), .en_r5(en_r5),
+           
+               .intercept_state(intercept_state),
+           
+               .sidebar_red(sidebar_red),
+               .sidebar_green(sidebar_green),
+               .sidebar_blue(sidebar_blue)
+           );
+
     
     always @ (posedge p_tick) begin
         if (p_en) begin
