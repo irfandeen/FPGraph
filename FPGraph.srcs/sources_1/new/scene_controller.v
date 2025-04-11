@@ -59,10 +59,10 @@ module scene_controller(
     // Debounce counter and period 
     reg [23:0] debounceCounter = 0;
     //reg prevPushState = 0;
-    localparam DEBOUNCE_PERIOD = 24'd4000000; // 160ms at 25MHz
-    reg btnc_press, btnr_press;
-    reg btnl_press, btnu_press;
-    reg btnd_press;
+    localparam DEBOUNCE_PERIOD = 24'd5000000; // 160ms at 25MHz
+    wire btnc_press, btnr_press;
+    wire btnl_press, btnu_press;
+    wire btnd_press;
     reg [4:0] prevPushState;
     
     //states
@@ -241,56 +241,80 @@ module scene_controller(
     );
     
 
-
+debounce a(
+    .signal_in(btnu),
+    .clk_in(CLOCK),
+    .signal_out(btnu_press)
+);
+debounce b(
+    .signal_in(btnd),
+    .clk_in(CLOCK),
+    .signal_out(btnd_press)
+);
+debounce c(
+    .signal_in(btnl),
+    .clk_in(CLOCK),
+    .signal_out(btnl_press)
+);
+debounce d(
+    .signal_in(btnr),
+    .clk_in(CLOCK),
+    .signal_out(btnr_press)
+);
+debounce e(
+    .signal_in(btnc),
+    .clk_in(CLOCK),
+    .signal_out(btnc_press)
+);
 
 
     
     
      //Button synchronization and edge detection
-        always @(posedge CLOCK) begin
+//        always @(posedge CLOCK) begin
         
-             if (debounceCounter == 0) begin
-            // No new presses this cycle
-            btnu_press <= 0; btnd_press <= 0;
-            btnc_press <= 0; btnr_press <= 0; btnl_press <= 0;
-        end
+//             if (debounceCounter == 0) begin
+//            // No new presses this cycle
+//            btnu_press <= 0; btnd_press <= 0;
+//            btnc_press <= 0; btnr_press <= 0; btnl_press <= 0;
+//        end
         
-        if (debounceCounter > 0) begin
-            debounceCounter <= debounceCounter - 1;
-            btnu_press <= 0; btnd_press <= 0;
-            btnc_press <= 0; btnr_press <= 0; btnl_press <= 0;
-        end else begin
-            // Detect new press per button (rising edge)
-            if (btnu && !prevPushState[0]) begin
-                btnu_press <= 1;
-                debounceCounter <= DEBOUNCE_PERIOD;
-            end
-            if (btnd && !prevPushState[1]) begin
-                btnd_press <= 1;
-                debounceCounter <= DEBOUNCE_PERIOD;
-            end
-            if (btnc && !prevPushState[2]) begin
-                btnc_press <= 1;
-                debounceCounter <= DEBOUNCE_PERIOD;
-            end
-            if (btnr && !prevPushState[3]) begin
-                btnr_press <= 1;
-                debounceCounter <= DEBOUNCE_PERIOD;
-            end
-            if (btnl && !prevPushState[4]) begin
-                btnl_press <= 1;
-                debounceCounter <= DEBOUNCE_PERIOD;
-            end
-        end
+//        if (debounceCounter > 0) begin
+//            debounceCounter <= debounceCounter - 1;
+//            btnu_press <= 0; btnd_press <= 0;
+//            btnc_press <= 0; btnr_press <= 0; btnl_press <= 0;
+//        end else begin
+//            // Detect new press per button (rising edge)
+//            if (btnu && !prevPushState[0]) begin
+//                btnu_press <= 1;
+//                debounceCounter <= DEBOUNCE_PERIOD;
+//            end
+//            if (btnd && !prevPushState[1]) begin
+//                btnd_press <= 1;
+//                debounceCounter <= DEBOUNCE_PERIOD;
+//            end
+//            if (btnc && !prevPushState[2]) begin
+//                btnc_press <= 1;
+//                debounceCounter <= DEBOUNCE_PERIOD;
+//            end
+//            if (btnr && !prevPushState[3]) begin
+//                btnr_press <= 1;
+//                debounceCounter <= DEBOUNCE_PERIOD;
+//            end
+//            if (btnl && !prevPushState[4]) begin
+//                btnl_press <= 1;
+//                debounceCounter <= DEBOUNCE_PERIOD;
+//            end
+//        end
         
-        // Always update prevPushState at the end
-        prevPushState[0] <= btnu;
-        prevPushState[1] <= btnd;
-        prevPushState[2] <= btnc;
-        prevPushState[3] <= btnr;
-        prevPushState[4] <= btnl;
+//        // Always update prevPushState at the end
+//        prevPushState[0] <= btnu;
+//        prevPushState[1] <= btnd;
+//        prevPushState[2] <= btnc;
+//        prevPushState[3] <= btnr;
+//        prevPushState[4] <= btnl;
  
-        end
+//        end
         
         always @ (posedge CLOCK) begin
         if (state == interstate) begin
