@@ -25,7 +25,7 @@ module debounce(
     input wire clk_in,
     output reg signal_out
 );
-    parameter TIME_OUT = 2000000;
+    parameter TIME_OUT = 4000000;
 
     reg [31:0]  counter = 0;
     reg        time_out = 0;
