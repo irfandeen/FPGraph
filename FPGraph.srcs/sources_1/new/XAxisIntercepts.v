@@ -29,7 +29,7 @@ module XAxisIntercepts(
     input       [13:0]   c3Integer,
     //---------------------------------------------------------
 
-    //---------------Graph 1 Intercepts----------------
+    //---------------Graph 1 X Intercepts----------------
     output reg           g1_X1Sign,
     output reg [13:0]   g1_X1Int, g1_X1Dec,
     
@@ -45,7 +45,7 @@ module XAxisIntercepts(
     output reg [1:0]    g1_isCalculated,
     //---------------------------------------------------------
 
-    //---------------Graph 2 Intercepts----------------
+    //---------------Graph 2 X Intercepts----------------
     output reg           g2_X1Sign,
     output reg [13:0]   g2_X1Int, g2_X1Dec,
     
@@ -61,7 +61,7 @@ module XAxisIntercepts(
     output reg [1:0]    g2_isCalculated,
     //----------------------------------------------------------
 
-    //---------------Graph 3 Intercepts-----------------
+    //---------------Graph 3 X Intercepts-----------------
     output reg           g3_X1Sign,
     output reg [13:0]   g3_X1Int, g3_X1Dec,
     
