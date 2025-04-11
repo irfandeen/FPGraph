@@ -11,7 +11,7 @@ module IntersectionQuadratic(
                       y1Integer, y1Decimal,
                       x2Integer, x2Decimal,
                       y2Integer, y2Decimal,
-    output reg [1:0] isCalculated,  // 0: NOT_CALCULATED, 1: CALCULATED, 2: NO_SOLUTION
+    output reg [1:0] isCalculated  // 0: NOT_CALCULATED, 1: CALCULATED, 2: NO_SOLUTION
 
     /*
     // DEBUG ONLY
