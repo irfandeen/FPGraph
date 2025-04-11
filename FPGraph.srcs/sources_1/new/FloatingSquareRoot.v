@@ -4,10 +4,10 @@ module FloatingSquareRoot(
     input basysClock,
     input startCalculate,
     input sign,
-    input [23:0] xInteger,
-    input [23:0] xDecimal,
-    output reg [23:0] resultInteger,
-    output reg [23:0] resultDecimal,
+    input [13:0] xInteger,
+    input [13:0] xDecimal,
+    output reg [13:0] resultInteger,
+    output reg [13:0] resultDecimal,
     output resultSign,
     output reg isCalculated
 
@@ -33,15 +33,15 @@ module FloatingSquareRoot(
 
     reg firstValueSign  = POS;
     reg secondValueSign = POS;
-    reg [23:0] firstValueInteger;
-    reg [23:0] firstValueDecimal;
-    reg [23:0] secondValueInteger;
-    reg [23:0] secondValueDecimal;
+    reg [13:0] firstValueInteger;
+    reg [13:0] firstValueDecimal;
+    reg [13:0] secondValueInteger;
+    reg [13:0] secondValueDecimal;
     reg [1:0]  operation;
 
     wire       finalSign;
-    wire [23:0] finalResultInteger;
-    wire [23:0] finalResultDecimal;
+    wire [13:0] finalResultInteger;
+    wire [13:0] finalResultDecimal;
     wire        isFloatingCalculated;
     
     //DEBUG ONLY
@@ -69,12 +69,12 @@ module FloatingSquareRoot(
     reg prevStartCalculate = 0;
     reg [3:0] state      = 12;
     reg [3:0] innerState = 0;        
-    reg [23:0] guessInteger = 1;
-    reg [23:0] guessDecimal;
-    reg [23:0] xDividedByGuessInteger;
-    reg [23:0] xDividedByGuessDecimal;
-    reg [23:0] xPlusXDividedByGuessInteger;
-    reg [23:0] xPlusXDividedByGuessDecimal;
+    reg [13:0] guessInteger = 1;
+    reg [13:0] guessDecimal;
+    reg [13:0] xDividedByGuessInteger;
+    reg [13:0] xDividedByGuessDecimal;
+    reg [13:0] xPlusXDividedByGuessInteger;
+    reg [13:0] xPlusXDividedByGuessDecimal;
 
     always @(posedge basysClock) begin
         //DEBUG ONLY
