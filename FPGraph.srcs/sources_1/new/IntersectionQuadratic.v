@@ -87,6 +87,7 @@ module IntersectionQuadratic(
     // Internal registers for quadratic computation
     // Combine the sign with the integer coefficients (decimals are not used)
     reg signed [14:0] a1, b1, c1, a2, b2, c2;
+    reg signed [14:0] a,b,c;
     
     // Discriminant
     reg signed [14:0] disc;
@@ -184,9 +185,8 @@ module IntersectionQuadratic(
     
     /* Main Sequential Calculation */
     always @(posedge clk1Mhz) begin
-        
         /*
-        // DEBUG signals
+        // DEBUG signals (commented out)
         calculationPhaseDebug <= calculationPhase;
         isCalculatedRootDebug <= isCalculatedRoot;
         sqrtDiscSignDebug <= sqrtDiscSign;
@@ -207,7 +207,185 @@ module IntersectionQuadratic(
         if (startCalculate && !prevStartCalculate) begin
             calculationPhase <= 0;
             isCalculated     <= NOT_CALCULATED;
+
         end else begin
+
+            if (a1 == a2) begin
+                case (calculationPhase)
+                0: begin
+                    a1 <= (a1Sign == POS) ? a1Integer : -a1Integer;
+                    b1 <= (b1Sign == POS) ? b1Integer : -b1Integer;
+                    c1 <= (c1Sign == POS) ? c1Integer : -c1Integer;
+                    a2 <= (a2Sign == POS) ? a2Integer : -a2Integer;
+                    b2 <= (b2Sign == POS) ? b2Integer : -b2Integer;
+                    c2 <= (c2Sign == POS) ? c2Integer : -c2Integer;
+                    calculationPhase <= 1;
+                end
+
+                1: begin
+                    a <= a1 - a2;
+                    b <= b1 - b2;
+                    c <= c1 - c2;
+                    calculationPhase <= 2;
+                end
+
+                2: begin
+                    if (c >= 0) begin
+                        firstValueSign    <= POS;
+                        firstValueInteger <= c;
+                        firstValueDecimal <= 0;
+                    end else begin
+                        firstValueSign    <= NEG;
+                        firstValueInteger <= -c;
+                        firstValueDecimal <= 0;
+                    end
+
+                    if (b >= 0) begin
+                        secondValueSign    <= POS;
+                        secondValueInteger <= b;
+                        secondValueDecimal <= 0;
+                    end else begin
+                        secondValueSign    <= NEG;
+                        secondValueInteger <= -b;
+                        secondValueDecimal <= 0;
+                    end
+
+                    operation         <= DIV;
+                    mode              <= BYPASS_MODE;
+                    calculationPhase  <= 3;
+                end
+
+                3: begin
+                    if (isCalculatedFloating) begin
+                        firstAnsSign  <= finalSign;
+                        firstAnsInt   <= finalResultInteger;
+                        firstAnsDec   <= finalResultDecimal;
+
+                        // NULL ans boilerplate
+                        secondAnsSign <= POS;
+                        secondAnsInt  <= 0;
+                        secondAnsDec  <= 0;
+
+                        calculationPhase <= 4;
+                    end
+                end
+
+                4: begin // Phase 4: Compute (first x)^2
+                    firstValueSign    <= firstAnsSign;
+                    firstValueInteger <= firstAnsInt;
+                    firstValueDecimal <= firstAnsDec;
+                    secondValueSign   <= firstAnsSign;
+                    secondValueInteger<= firstAnsInt;
+                    secondValueDecimal<= firstAnsDec;
+                    operation         <= MUL;
+                    mode              <= BYPASS_MODE;
+                    calculationPhase  <= 5;
+                end
+
+                5: begin // Phase 5: Latch (first x)^2
+                    if (isCalculatedFloating) begin
+                        firstAnsSquareSign <= finalSign;
+                        firstAnsSquareInt  <= finalResultInteger;
+                        firstAnsSquareDec  <= finalResultDecimal;
+                        calculationPhase   <= 6;
+                    end
+                end
+
+                6: begin // Phase 6: Compute a1*x^2
+                    firstValueSign    <= firstAnsSquareSign;
+                    firstValueInteger <= firstAnsSquareInt;
+                    firstValueDecimal <= firstAnsSquareDec;
+                    secondValueSign   <= a1Sign;
+                    secondValueInteger<= a1Integer;
+                    secondValueDecimal<= 0;
+                    operation         <= MUL;
+                    mode              <= BYPASS_MODE;
+                    calculationPhase  <= 7;
+                end
+
+                7: begin // Phase 7: Latch a1*x^2
+                    if (isCalculatedFloating) begin
+                        firstAnsSquareMultiplyASign <= finalSign;
+                        firstAnsSquareMultiplyAInt  <= finalResultInteger;
+                        firstAnsSquareMultiplyADec  <= finalResultDecimal;
+                        calculationPhase            <= 8;
+                    end
+                end
+
+                8: begin // Phase 8: Compute b1*x
+                    firstValueSign    <= firstAnsSign;
+                    firstValueInteger <= firstAnsInt;
+                    firstValueDecimal <= firstAnsDec;
+                    secondValueSign   <= b1Sign;
+                    secondValueInteger<= b1Integer;
+                    secondValueDecimal<= 0;
+                    operation         <= MUL;
+                    mode              <= BYPASS_MODE;
+                    calculationPhase  <= 9;
+                end
+
+                9: begin // Phase 9: Latch b1*x
+                    if (isCalculatedFloating) begin
+                        firstAnsMultiplyBSign <= finalSign;
+                        firstAnsMultiplyBInt  <= finalResultInteger;
+                        firstAnsMultiplyBDec  <= finalResultDecimal;
+                        calculationPhase      <= 10;
+                    end
+                end
+
+                10: begin // Phase 10: Compute (a1*x^2 + b1*x)
+                    firstValueSign    <= firstAnsSquareMultiplyASign;
+                    firstValueInteger <= firstAnsSquareMultiplyAInt;
+                    firstValueDecimal <= firstAnsSquareMultiplyADec;
+                    secondValueSign   <= firstAnsMultiplyBSign;
+                    secondValueInteger<= firstAnsMultiplyBInt;
+                    secondValueDecimal<= firstAnsMultiplyBDec;
+                    operation         <= ADD;
+                    mode              <= BYPASS_MODE;
+                    calculationPhase  <= 11;
+                end
+
+                11: begin // Phase 11: Latch (a1*x^2 + b1*x)
+                    if (isCalculatedFloating) begin
+                        firstAnsAPlusBSign <= finalSign;
+                        firstAnsAPlusBInt  <= finalResultInteger;
+                        firstAnsAPlusBDec  <= finalResultDecimal;
+                        calculationPhase  <= 12;
+                    end
+                end
+
+                12: begin // Phase 12: Compute y1 = (a1*x^2 + b1*x) + c1
+                    firstValueSign    <= firstAnsAPlusBSign;
+                    firstValueInteger <= firstAnsAPlusBInt;
+                    firstValueDecimal <= firstAnsAPlusBDec;
+                    secondValueSign   <= c1Sign;
+                    secondValueInteger<= c1Integer;
+                    secondValueDecimal<= 0;
+                    operation         <= ADD;
+                    mode              <= BYPASS_MODE;
+                    calculationPhase  <= 13;
+                end
+
+                13: begin // Phase 13: Latch y1 and null y2
+                if (isCalculatedFloating) begin 
+                        firstAnsYSign <= finalSign;
+                        firstAnsYInt  <= finalResultInteger;
+                        firstAnsYDec  <= finalResultDecimal;
+
+                        secondAnsYSign <= POS;
+                        secondAnsYInt  <= 0;
+                        secondAnsYDec  <= 0;
+                        calculationPhase <= 14;
+
+                        isCalculated <= CALCULATED;
+                    end
+                    end
+
+                14: begin 
+                    //Do nothing
+                end
+                endcase
+            end else begin
             case (calculationPhase)
                 // Phase 0: Compute coefficients (combine sign and integer value)
                 0: begin
@@ -604,12 +782,14 @@ module IntersectionQuadratic(
                     isCalculated <= CALCULATED;
                     calculationPhase <= 37;
                 end
-                // Phase 37: Final state, waiting for next startCalculate.
+
                 37: begin
                     // No operation.
                 end
+
                 default: ;
             endcase
+        end
         end
     end
 
