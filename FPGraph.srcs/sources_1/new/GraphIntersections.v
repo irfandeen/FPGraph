@@ -138,12 +138,12 @@ wire [13:0] line_g2g3_Y2Int,  line_g2g3_Y2Dec;
 wire [1:0]  line_g2g3_isCalculated;
 
 wire mode;
-assign mode = sw[0] == 1 ? 0 : 1;
+assign mode = sw[GRAPH_INTERCEPT] == 1 ? 0 : 1;
 
     LineIntercepts lineIntercepts (
         .basysClock(basysClock),
         .startCalculate(startCalculate),
-        .mode(mode)
+        .mode(mode),
         .a1Sign(a1Sign),
         .a1Integer(a1Integer),
         .b1Sign(b1Sign),
@@ -220,7 +220,7 @@ assign mode = sw[0] == 1 ? 0 : 1;
         .clk_out(clk10Khz)
     );
     
-    always @ (posedge clk10Khz) begin
+    always @(posedge clk10Khz) begin
         startCalculate <= 0;
         
         if (sw[GRAPH_INTERCEPT] == 1) begin
@@ -294,6 +294,80 @@ assign mode = sw[0] == 1 ? 0 : 1;
                 p4_en     <= 1;
                 p5_en     <= 1;
             end else if (line_g1g3_isCalculated == NO_SOLUTION) begin
+                p4_en <= 0;
+                p5_en <= 0;
+            end
+        end else if (sw[X_INTERCEPT] == 1) begin
+            startCalculate <= 1;
+            
+            if (line_g1g2_isCalculated == CALCULATED) begin
+                p0_x_sign <= line_g1g2_X1Sign;
+                p0_x_int  <= line_g1g2_X1Int;
+                p0_x_dec  <= line_g1g2_X1Dec;
+                
+                p0_y_sign <= line_g1g2_Y1Sign;
+                p0_y_int  <= line_g1g2_Y1Int;
+                p0_y_dec  <= line_g1g2_Y1Dec;
+                
+                p1_x_sign <= line_g1g2_X2Sign;
+                p1_x_int  <= line_g1g2_X2Int;
+                p1_x_dec  <= line_g1g2_X2Dec;
+                
+                p1_y_sign <= line_g1g2_Y2Sign;
+                p1_y_int  <= line_g1g2_Y2Int;
+                p1_y_dec  <= line_g1g2_Y2Dec;
+                
+                p0_en     <= 1;
+                p1_en     <= 1;
+            end else if (line_g1g2_isCalculated == NO_SOLUTION) begin
+                p0_en <= 0;
+                p1_en <= 0;
+            end
+            
+            if (line_g1g3_isCalculated == CALCULATED) begin
+                p2_x_sign <= line_g1g3_X1Sign;
+                p2_x_int  <= line_g1g3_X1Int;
+                p2_x_dec  <= line_g1g3_X1Dec;
+                
+                p2_y_sign <= line_g1g3_Y1Sign;
+                p2_y_int  <= line_g1g3_Y1Int;
+                p2_y_dec  <= line_g1g3_Y1Dec;
+                
+                p3_x_sign <= line_g1g3_X2Sign;
+                p3_x_int  <= line_g1g3_X2Int;
+                p3_x_dec  <= line_g1g3_X2Dec;
+                
+                p3_y_sign <= line_g1g3_Y2Sign;
+                p3_y_int  <= line_g1g3_Y2Int;
+                p3_y_dec  <= line_g1g3_Y2Dec;
+                
+                p2_en     <= 1;
+                p3_en     <= 1;
+            end else if (line_g1g3_isCalculated == NO_SOLUTION) begin
+                p2_en <= 0;
+                p3_en <= 0;
+            end
+            
+            if (line_g2g3_isCalculated == CALCULATED) begin
+                p4_x_sign <= line_g2g3_X1Sign;
+                p4_x_int  <= line_g2g3_X1Int;
+                p4_x_dec  <= line_g2g3_X1Dec;
+                
+                p4_y_sign <= line_g2g3_Y1Sign;
+                p4_y_int  <= line_g2g3_Y1Int;
+                p4_y_dec  <= line_g2g3_Y1Dec;
+                
+                p5_x_sign <= line_g2g3_X2Sign;
+                p5_x_int  <= line_g2g3_X2Int;
+                p5_x_dec  <= line_g2g3_X2Dec;
+                
+                p5_y_sign <= line_g2g3_Y2Sign;
+                p5_y_int  <= line_g2g3_Y2Int;
+                p5_y_dec  <= line_g2g3_Y2Dec;
+                
+                p4_en     <= 1;
+                p5_en     <= 1;
+            end else if (line_g2g3_isCalculated == NO_SOLUTION) begin
                 p4_en <= 0;
                 p5_en <= 0;
             end
