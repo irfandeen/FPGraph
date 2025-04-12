@@ -251,10 +251,8 @@ always @(posedge clk10Khz) begin
             
             p0_en <= 1;
             p1_en <= 1;
-        end else if (g1g2_isCalculated == NO_SOLUTION && startCalculate == 1) begin
-            p0_en <= 0;
-            p1_en <= 0;
         end
+        
         
         if (g2g3_isCalculated == CALCULATED && startCalculate == 1) begin
             p2_x_sign <= g2g3_X1Sign;
@@ -275,10 +273,8 @@ always @(posedge clk10Khz) begin
             
             p2_en <= 1;
             p3_en <= 1;
-        end else if (g2g3_isCalculated == NO_SOLUTION && startCalculate == 1) begin
-            p2_en <= 0;
-            p3_en <= 0;
         end
+        
         
         if (g1g3_isCalculated == CALCULATED && startCalculate == 1) begin
             p4_x_sign <= g1g3_X1Sign;
@@ -299,9 +295,6 @@ always @(posedge clk10Khz) begin
             
             p4_en <= 1;
             p5_en <= 1;
-        end else if (g1g3_isCalculated == NO_SOLUTION && startCalculate == 1) begin
-            p4_en <= 0;
-            p5_en <= 0;
         end
     end else if (sw[X_INTERCEPT] == 1) begin
         startCalculate <= 1;
@@ -325,10 +318,8 @@ always @(posedge clk10Khz) begin
             
             p0_en <= 1;
             p1_en <= 1;
-        end else if (g1g2_isCalculated == NO_SOLUTION && startCalculate == 1) begin
-            p0_en <= 0;
-            p1_en <= 0;
         end
+        
         
         if (g1g3_isCalculated == CALCULATED && startCalculate == 1) begin
             p2_x_sign <= g1g3_X1Sign;
@@ -349,10 +340,8 @@ always @(posedge clk10Khz) begin
             
             p2_en <= 1;
             p3_en <= 1;
-        end else if (g1g3_isCalculated == NO_SOLUTION && startCalculate == 1) begin
-            p2_en <= 0;
-            p3_en <= 0;
         end
+        
         
         if (g2g3_isCalculated == CALCULATED && startCalculate == 1) begin
             p4_x_sign <= g2g3_X1Sign;
@@ -373,9 +362,6 @@ always @(posedge clk10Khz) begin
             
             p4_en <= 1;
             p5_en <= 1;
-        end else if (g2g3_isCalculated == NO_SOLUTION && startCalculate == 1) begin
-            p4_en <= 0;
-            p5_en <= 0;
         end
     end else if (sw[Y_INTERCEPT] == 1) begin
         startCalculate <= 0; // Y intercept does not use module, so reset
