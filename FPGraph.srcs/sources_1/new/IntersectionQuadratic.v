@@ -11,12 +11,10 @@ module IntersectionQuadratic(
                       y1Integer, y1Decimal,
                       x2Integer, x2Decimal,
                       y2Integer, y2Decimal,
-    output reg [1:0] isCalculated  // 0: NOT_CALCULATED, 1: CALCULATED, 2: NO_SOLUTION
-
-    
+    output reg [1:0] isCalculated  
     /*
     // DEBUG ONLY
-    output reg [5:0] calculationPhaseDebug,
+    output reg [5:6] calculationPhaseDebug,
     output reg       isCalculatedRootDebug,
     output reg       sqrtDiscSignDebug,
     output reg [13:0] sqrtDiscIntDebug, sqrtDiscDecDebug,
@@ -27,12 +25,12 @@ module IntersectionQuadratic(
     output reg twoASignDebug, minusBSignDebug
     // DEBUG ONLY
     */
-    
 );
 
     localparam NOT_CALCULATED = 0, CALCULATED = 1, NO_SOLUTION = 2;
     localparam ADD = 0, SUB = 1, MUL = 2, DIV = 3;
     localparam POS = 0, NEG = 1;
+    localparam ROOT_MODE = 1, BYPASS_MODE = 0;
     
     // FloatingPoint Calculator Signals
     reg         firstValueSign;
@@ -48,20 +46,6 @@ module IntersectionQuadratic(
     wire        finalSign;
     wire        isCalculatedFloating;
     
-    FloatingPoint calculator (
-        .firstValueSign(firstValueSign),
-        .secondValueSign(secondValueSign),
-        .firstValueInteger(firstValueInteger),
-        .firstValueDecimal(firstValueDecimal),
-        .secondValueInteger(secondValueInteger),
-        .secondValueDecimal(secondValueDecimal),
-        .operation(operation),
-        .finalSign(finalSign),
-        .finalResultInteger(finalResultInteger),
-        .finalResultDecimal(finalResultDecimal),
-        .isCalculated(isCalculatedFloating)
-    );
-    
     // FloatingSquareRoot Calculator Signals
     reg         sqrtStart;
     reg [13:0]  sqrtInteger;
@@ -74,6 +58,20 @@ module IntersectionQuadratic(
     
     FloatingSquareRoot squareRootCalculator (
         .basysClock(basysClock),
+        .mode(mode)
+
+        .firstValueSignBypass(firstValueSign),
+        .secondValueSignBypass(secondValueSign),
+        .firstValueIntegerBypass(firstValueInteger),
+        .firstValueDecimalBypass(firstValueDecimal),
+        .secondValueIntegerBypass(secondValueInteger),
+        .secondValueDecimalBypass(secondValueDecimal),
+        .operationBypass(operation),
+        .finalSignBypass(finalSign),
+        .finalResultIntegerBypass(finalResultInteger),
+        .finalResultDecimalBypass(finalResultDecimal),
+        .isCalculatedFloatingBypass(isCalculatedFloating),
+
         .startCalculate(sqrtStart),
         .sign(POS),
         .xInteger(sqrtInteger),
@@ -241,6 +239,7 @@ module IntersectionQuadratic(
                         isCalculated <= NO_SOLUTION;
                         calculationPhase <= 37;
                     end else begin
+                        mode <= ROOT_MODE;
                         sqrtStart   <= 0;
                         sqrtInteger <= discInt;
                         sqrtDecimal <= 0;
@@ -284,6 +283,7 @@ module IntersectionQuadratic(
                     secondValueInteger<= sqrtDiscInt;
                     secondValueDecimal<= sqrtDiscDec;
                     operation         <= ADD;
+                    mode              <= BYPASS_MODE;
                     calculationPhase  <= 8;
                 end
                 // Phase 8: Latch first numerator
@@ -304,6 +304,7 @@ module IntersectionQuadratic(
                     secondValueInteger<= sqrtDiscInt;
                     secondValueDecimal<= sqrtDiscDec;
                     operation         <= SUB;
+                    mode              <= BYPASS_MODE;
                     calculationPhase  <= 10;
                 end
                 // Phase 10: Latch second numerator
@@ -339,6 +340,7 @@ module IntersectionQuadratic(
                     secondValueInteger<= twoAInt;
                     secondValueDecimal<= 0;
                     operation         <= DIV;
+                    mode              <= BYPASS_MODE;
                     calculationPhase  <= 13;
                 end
                 // Phase 13: Latch first x solution
@@ -359,6 +361,7 @@ module IntersectionQuadratic(
                     secondValueInteger<= firstAnsInt;
                     secondValueDecimal<= firstAnsDec;
                     operation         <= MUL;
+                    mode              <= BYPASS_MODE;
                     calculationPhase  <= 15;
                 end
                 // Phase 15: Latch (first x)^2
@@ -379,6 +382,7 @@ module IntersectionQuadratic(
                     secondValueInteger<= a1Integer;
                     secondValueDecimal<= 0;
                     operation         <= MUL;
+                    mode              <= BYPASS_MODE;
                     calculationPhase  <= 17;
                 end
                 // Phase 17: Latch a1*x^2
@@ -399,6 +403,7 @@ module IntersectionQuadratic(
                     secondValueInteger<= b1Integer;
                     secondValueDecimal<= 0;
                     operation         <= MUL;
+                    mode              <= BYPASS_MODE;
                     calculationPhase  <= 19;
                 end
                 // Phase 19: Latch b1*x
@@ -419,6 +424,7 @@ module IntersectionQuadratic(
                     secondValueInteger<= firstAnsMultiplyBInt;
                     secondValueDecimal<= firstAnsMultiplyBDec;
                     operation         <= ADD;
+                    mode              <= BYPASS_MODE;
                     calculationPhase  <= 21;
                 end
                 // Phase 21: Latch (a1*x^2 + b1*x)
@@ -439,6 +445,7 @@ module IntersectionQuadratic(
                     secondValueInteger<= c1Integer;
                     secondValueDecimal<= 0;
                     operation         <= ADD;
+                    mode              <= BYPASS_MODE;
                     calculationPhase  <= 23;
                 end
                 // Phase 23: Latch y1
@@ -459,6 +466,7 @@ module IntersectionQuadratic(
                     secondValueInteger<= twoAInt;
                     secondValueDecimal<= 0;
                     operation         <= DIV;
+                    mode              <= BYPASS_MODE;
                     calculationPhase  <= 25;
                 end
                 // Phase 25: Latch second x solution
@@ -479,6 +487,7 @@ module IntersectionQuadratic(
                     secondValueInteger<= secondAnsInt;
                     secondValueDecimal<= secondAnsDec;
                     operation         <= MUL;
+                    mode              <= BYPASS_MODE;
                     calculationPhase  <= 27;
                 end
                 // Phase 27: Latch (second x)^2
@@ -499,6 +508,7 @@ module IntersectionQuadratic(
                     secondValueInteger<= a1Integer;
                     secondValueDecimal<= 0;
                     operation         <= MUL;
+                    mode              <= BYPASS_MODE;
                     calculationPhase  <= 29;
                 end
                 // Phase 29: Latch a1*(second x)^2
@@ -519,6 +529,7 @@ module IntersectionQuadratic(
                     secondValueInteger<= b1Integer;
                     secondValueDecimal<= 0;
                     operation         <= MUL;
+                    mode              <= BYPASS_MODE;
                     calculationPhase  <= 31;
                 end
                 // Phase 31: Latch b1*(second x)
@@ -539,6 +550,7 @@ module IntersectionQuadratic(
                     secondValueInteger<= secondAnsMultiplyBInt;
                     secondValueDecimal<= secondAnsMultiplyBDec;
                     operation         <= ADD;
+                    mode              <= BYPASS_MODE;
                     calculationPhase  <= 33;
                 end
                 // Phase 33: Latch (a1*(second x)^2 + b1*(second x))
@@ -559,6 +571,7 @@ module IntersectionQuadratic(
                     secondValueInteger<= c1Integer;
                     secondValueDecimal<= 0;
                     operation         <= ADD;
+                    mode              <= BYPASS_MODE;
                     calculationPhase  <= 35;
                 end
                 // Phase 35: Latch y2

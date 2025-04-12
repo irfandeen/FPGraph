@@ -2,6 +2,22 @@
 
 module FloatingSquareRoot(
     input basysClock,
+    input mode,
+
+    //Floating Point Bypass Mode 0 Input/Output
+    input  [1:0]  firstValueSignBypass,
+    input  [1:0]  secondValueSignBypass,
+    input  [13:0] firstValueIntegerBypass,
+    input  [13:0] firstValueDecimalBypass,
+    input  [13:0] secondValueIntegerBypass,
+    input  [13:0] secondValueDecimalBypass,
+    input  [1:0]  operationBypass,
+    output reg [1:0]  finalSignBypass,
+    output reg [13:0] finalResultIntegerBypass,
+    output reg [13:0] finalResultDecimalBypass,
+    output reg       isCalculatedFloatingBypass,
+
+    //Normal Root Mode 1 Input/Output
     input startCalculate,
     input sign,
     input [13:0] xInteger,
@@ -10,7 +26,6 @@ module FloatingSquareRoot(
     output reg [13:0] resultDecimal,
     output resultSign,
     output reg isCalculated
-
     /*
     //DEBUG ONLY
     output  [13:0] finalResultIntegerDebug,
@@ -20,7 +35,6 @@ module FloatingSquareRoot(
     output reg [3:0] innerStateDebug
     //DEBUG ONLY
     */
-    
 );
 
     localparam ADD         = 0;
@@ -40,7 +54,7 @@ module FloatingSquareRoot(
     reg [13:0] secondValueDecimal;
     reg [1:0]  operation;
 
-    wire       finalSign;
+    wire        finalSign;
     wire [13:0] finalResultInteger;
     wire [13:0] finalResultDecimal;
     wire        isFloatingCalculated;
@@ -79,17 +93,16 @@ module FloatingSquareRoot(
     reg [13:0] xPlusXDividedByGuessInteger;
     reg [13:0] xPlusXDividedByGuessDecimal;
 
-    //10Mhz Clock
+    // 10MHz Clock
     wire clk10Mhz;
 
-    // Instantiate the flexible_clock module with CLK_DIV = 50000 to get 1kHz output:
+    // Instantiate the flexible_clock module with CLK_DIV = 5 to get 10MHz output:
     flexible_clock #(.CLK_DIV(5)) clk_gen (
         .clk_in(basysClock),
         .clk_out(clk10Mhz)
     );
 
     always @(posedge clk10Mhz) begin
-
         /*
         //DEBUG ONLY
         stateDebug <= state;
@@ -107,69 +120,83 @@ module FloatingSquareRoot(
             guessDecimal  <= 0;
             innerState    <= 0;
         end
+        
+        case (mode)
+            0: begin // Bypass Mode
+                    firstValueSign   <= firstValueSignBypass;
+                    secondValueSign  <= secondValueSignBypass;
+                    firstValueInteger <= firstValueIntegerBypass;
+                    firstValueDecimal <= firstValueDecimalBypass;
+                    secondValueInteger<= secondValueIntegerBypass;
+                    secondValueDecimal<= secondValueDecimalBypass;
+                    operation         <= operationBypass;
+                    finalSignBypass   <= finalSign;
+                    finalResultIntegerBypass <= finalResultInteger;
+                    finalResultDecimalBypass <= finalResultDecimal;
+                    isCalculatedFloatingBypass <= isFloatingCalculated;
+                end
+            1: begin // Normal Root Mode
+                    case (state)
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9: begin
+                            if (innerState == 0) begin
+                                firstValueSign <= sign;
+                                firstValueInteger  <= xInteger;
+                                firstValueDecimal  <= xDecimal;
+                                secondValueSign <= sign;
+                                secondValueInteger <= guessInteger;
+                                secondValueDecimal <= guessDecimal;
+                                operation          <= DIV;
+                                innerState         <= 1;
+                            end else if (innerState == 1 && isFloatingCalculated == 1) begin
+                                xDividedByGuessInteger <= finalResultInteger;
+                                xDividedByGuessDecimal <= finalResultDecimal;
+                                innerState             <= 2;
+                            end else if (innerState == 2) begin
+                                firstValueInteger  <= xDividedByGuessInteger;
+                                firstValueDecimal  <= xDividedByGuessDecimal;
+                                secondValueInteger <= guessInteger;
+                                secondValueDecimal <= guessDecimal;
+                                operation          <= ADD;
+                                innerState         <= 3;
+                            end else if (innerState == 3 && isFloatingCalculated == 1) begin
+                                xPlusXDividedByGuessInteger <= finalResultInteger;
+                                xPlusXDividedByGuessDecimal <= finalResultDecimal;
+                                innerState                  <= 4;
+                            end else if (innerState == 4) begin
+                                firstValueInteger  <= xPlusXDividedByGuessInteger;
+                                firstValueDecimal  <= xPlusXDividedByGuessDecimal;
+                                secondValueInteger <= 2;
+                                secondValueDecimal <= 0;
+                                operation          <= DIV;
+                                innerState         <= 5;
+                            end else if (innerState == 5 && isFloatingCalculated == 1) begin
+                                guessInteger <= finalResultInteger;
+                                guessDecimal <= finalResultDecimal;
+                                innerState   <= 0;
+                                state        <= state + 1;
+                            end
+                        end
 
-        case (state)
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9: begin
-                if (innerState == 0) begin
-                    firstValueInteger  <= xInteger;
-                    firstValueDecimal  <= xDecimal;
-                    secondValueInteger <= guessInteger;
-                    secondValueDecimal <= guessDecimal;
-                    operation          <= DIV;
-                    innerState         <= 1;
-                end
-                else if (innerState == 1 && isFloatingCalculated == 1) begin
-                    xDividedByGuessInteger <= finalResultInteger;
-                    xDividedByGuessDecimal <= finalResultDecimal;
-                    innerState             <= 2;
-                end
-                else if (innerState == 2) begin
-                    firstValueInteger  <= xDividedByGuessInteger;
-                    firstValueDecimal  <= xDividedByGuessDecimal;
-                    secondValueInteger <= guessInteger;
-                    secondValueDecimal <= guessDecimal;
-                    operation          <= ADD;
-                    innerState         <= 3;
-                end
-                else if (innerState == 3 && isFloatingCalculated == 1) begin
-                    xPlusXDividedByGuessInteger <= finalResultInteger;
-                    xPlusXDividedByGuessDecimal <= finalResultDecimal;
-                    innerState                  <= 4;
-                end
-                else if (innerState == 4) begin
-                    firstValueInteger  <= xPlusXDividedByGuessInteger;
-                    firstValueDecimal  <= xPlusXDividedByGuessDecimal;
-                    secondValueInteger <= 2;
-                    secondValueDecimal <= 0;
-                    operation          <= DIV;
-                    innerState         <= 5;
-                end
-                else if (innerState == 5 && isFloatingCalculated == 1) begin
-                    guessInteger <= finalResultInteger;
-                    guessDecimal <= finalResultDecimal;
-                    innerState   <= 0;
-                    state        <= state + 1;
-                end
-            end
+                        10: begin
+                            resultInteger <= guessInteger;
+                            resultDecimal <= guessDecimal;
+                            state <= 11;
+                        end
 
-            10: begin
-                resultInteger <= guessInteger;
-                resultDecimal <= guessDecimal;
-                state <= 11;
-            end
+                        11: begin
+                            isCalculated <= 1;
+                            state <= 12;
+                        end
+                        
+                        12: begin
+                            // Do nothing
+                        end
 
-            11: begin
-                isCalculated <= 1;
-                state <= 12;
-            end
-            
-            12: begin
-            //Do nothing
-            end
-
-            default: begin
-                state <= 12;
-            end
+                        default: begin
+                            state <= 12;
+                        end
+                    endcase
+                end
         endcase
     end
 
