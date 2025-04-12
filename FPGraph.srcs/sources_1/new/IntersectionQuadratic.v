@@ -56,9 +56,11 @@ module IntersectionQuadratic(
     wire        sqrtResultSign;
     wire        isCalculatedRoot;
     
+    reg         mode;
+    
     FloatingSquareRoot squareRootCalculator (
         .basysClock(basysClock),
-        .mode(mode)
+        .mode(mode),
 
         .firstValueSignBypass(firstValueSign),
         .secondValueSignBypass(secondValueSign),
